@@ -638,3 +638,30 @@ export function glintTexture() {
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
+
+/**
+ * Afterglow: the band of warm light that sits on the horizon after sunset and
+ * fades into the cooler sky above. A captured sky at this lens length is too
+ * coarse to carry it, so it is painted on a distant card behind the pad.
+ * `toward` is the camera position on the ground.
+ */
+export function buildAfterglow(toward: THREE.Vector3) {
+  const [cc, c] = canvas(8, 512);
+  const g = c.createLinearGradient(0, 512, 0, 0);
+  g.addColorStop(0, "rgba(236,170,128,0.62)");
+  g.addColorStop(0.1, "rgba(226,160,132,0.5)");
+  g.addColorStop(0.3, "rgba(170,150,160,0.24)");
+  g.addColorStop(0.62, "rgba(96,140,156,0.1)");
+  g.addColorStop(1, "rgba(96,140,156,0)");
+  c.fillStyle = g;
+  c.fillRect(0, 0, 8, 512);
+  const map = new THREE.CanvasTexture(cc);
+  map.colorSpace = THREE.SRGBColorSpace;
+  const mat = new THREE.MeshBasicMaterial({ map, transparent: true, depthWrite: false, fog: false });
+  const card = new THREE.Mesh(new THREE.PlaneGeometry(60000, 1500), mat);
+  const dir = toward.clone().setY(0).normalize();
+  card.position.copy(dir).multiplyScalar(-14000).setY(750 - 20);
+  card.lookAt(toward.x, 730, toward.z);
+  card.renderOrder = -1;
+  return card;
+}

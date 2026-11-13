@@ -103,7 +103,7 @@ export default function Story() {
               <div className="copy">
                 <h1>Taller than the Statue of Liberty.</h1>
                 <p className="lede">
-                  {Math.round(height * 3.28084)} feet ({Math.round(height)} metres) of steel, built to fly to orbit and come back.
+                  {Math.round(Math.round(height) * 3.28084)} feet ({Math.round(height)} metres) of steel, built to fly to orbit and come back.
                 </p>
                 <p className="cue">Scroll to begin</p>
               </div>

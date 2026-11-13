@@ -10,7 +10,8 @@
       "unit": "m",
       "verified": true,
       "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
-      "asOf": "2026-11-13"
+      "asOf": "2026-11-13",
+      "note": "Official SpaceX page rounds this to 124 m / 407 ft. Show 407 feet on screen."
     },
     "diameter": {
       "value": 9,
@@ -33,7 +34,8 @@
       "unit": "m",
       "verified": true,
       "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
-      "asOf": "2026-11-13"
+      "asOf": "2026-11-13",
+      "note": "Official SpaceX page rounds this to 72 m / 236 ft."
     },
     "boosterEngines": {
       "value": 33,
@@ -47,8 +49,8 @@
       "value": 90.6,
       "unit": "MN",
       "approx": true,
-      "note": "Owner decision 13 Nov 2026: show \"about 90 MN\". 33 x 280 tf = 9,240 tf = 90.6 MN. Some sources still quote ~80.8 MN (33 x 250 tf).",
-      "verified": true,
+      "note": "CONFLICT. Owner chose 'about 90 MN' on 13 Nov 2026 (33 x 280 tf). Checked the official SpaceX Starship page the same day: it lists Super Heavy thrust as 8,240 tf / 18.1 Mlbf (= 80.8 MN, 33 x 250 tf). Owner to re-confirm.",
+      "verified": false,
       "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
       "asOf": "2026-11-13"
     },
@@ -56,18 +58,18 @@
       "value": 280,
       "unit": "tf",
       "approx": true,
-      "note": "Sea level. Sources range 250 to 330 tf; 280 tf is the figure most often quoted. No external engine heat shield.",
-      "verified": true,
+      "note": "Official SpaceX page lists 250 tf / 551 klbf per Raptor. Other 2026 sources quote 280 tf for Raptor 3. Unresolved with the thrust figure below.",
+      "verified": false,
       "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
       "asOf": "2026-11-13"
     },
     "shipHeight": {
-      "value": 52.1,
+      "value": 52,
       "unit": "m",
-      "approx": true,
-      "note": "Derived: 124.4 - 72.3. One low-reliability source says ~53 m. No official V3 ship height found.",
-      "verified": false,
-      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "approx": false,
+      "note": "Official SpaceX figure: 52 m / 171 ft.",
+      "verified": true,
+      "source": "https://www.spacex.com/vehicles/starship/",
       "asOf": "2026-11-13"
     },
     "shipEngines": {
@@ -81,17 +83,17 @@
     "boosterPropellant": {
       "value": 3650,
       "unit": "t",
-      "approx": true,
+      "approx": false,
       "verified": true,
-      "source": "https://newspaceeconomy.ca/2026/04/16/detailed-review-of-starship-v3/",
+      "source": "https://www.spacex.com/vehicles/starship/",
       "asOf": "2026-11-13"
     },
     "shipPropellant": {
       "value": 1600,
       "unit": "t",
-      "approx": true,
+      "approx": false,
       "verified": true,
-      "source": "https://newspaceeconomy.ca/2026/04/16/detailed-review-of-starship-v3/",
+      "source": "https://www.spacex.com/vehicles/starship/",
       "asOf": "2026-11-13"
     },
     "payloadToLEO": {
@@ -133,13 +135,20 @@
       "verified": true,
       "source": "https://en.wikipedia.org/wiki/List_of_Starship_launches",
       "asOf": "2026-11-13"
+    },
+    "shipThrust": {
+      "value": 1614,
+      "unit": "tf",
+      "verified": true,
+      "source": "https://www.spacex.com/vehicles/starship/",
+      "asOf": "2026-11-13"
     }
   },
   "facilities": {
     "starbaseBuildings": {
       "value": "Starfactory, Mega Bay 1, Mega Bay 2, Gigabay (under construction, target end of 2026)",
       "unit": "text",
-      "note": "Names confirmed. Claims from Oct 2026 that the Gigabay is operational are unconfirmed.",
+      "note": "SpaceX's own site uses the name Starfactory and says Starbase has two launch towers.",
       "verified": true,
       "source": "https://www.nasaspaceflight.com/2026/01/starship-foundations-2026/",
       "asOf": "2026-11-13"
@@ -329,8 +338,8 @@
         "value": 90.6,
         "unit": "MN",
         "approx": true,
-        "note": "Owner decision 13 Nov 2026: show \"about 90 MN\". 33 x 280 tf = 9,240 tf = 90.6 MN. Some sources still quote ~80.8 MN (33 x 250 tf).",
-        "verified": true,
+        "note": "CONFLICT. Owner chose 'about 90 MN' on 13 Nov 2026 (33 x 280 tf). Checked the official SpaceX Starship page the same day: it lists Super Heavy thrust as 8,240 tf / 18.1 Mlbf (= 80.8 MN, 33 x 250 tf). Owner to re-confirm.",
+        "verified": false,
         "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
         "asOf": "2026-11-13"
       },

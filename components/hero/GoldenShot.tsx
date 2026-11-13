@@ -12,6 +12,7 @@ import {
   STACK_H,
   TOWER_H,
   TOWER_X,
+  buildAfterglow,
   buildForeground,
   buildGround,
   buildSite,
@@ -120,7 +121,7 @@ function Lights() {
     for (const [x, z] of MASTS) lamp(g, x, MAST_H + 1, z + 0.6, 0.6, 17, "#fff3e2", 1.3);
     for (let y = 18; y < TOWER_H; y += 24) lamp(g, TOWER_X - 6, y, 6.8, 0.3, 9);
     for (let y = 30; y < TOWER_H; y += 36) lamp(g, TOWER_X + 0.9, y, -4, 0.25, 7, "#ffe9c4");
-    for (let i = 0; i < 9; i++) lamp(g, 115 + i * 15.5, 3.5, -20, 0.25, 6, "#ffd9a0", 0.8);
+    for (let i = 0; i < 9; i++) lamp(g, 115 + i * 15.5, 3.5, -20, 0.25, 7, "#ffb060", 1.1);
     for (let i = 0; i < 5; i++) lamp(g, -100 - i * 34, 6, 12, 0.22, 5, "#ffd9a0", 0.7);
     const beaconFlare = lamp(g, TOWER_X - 6, TOWER_H + 16.5, 0, 0.3, 12, "#ff2a12", 2);
 
@@ -183,7 +184,7 @@ export default function GoldenShot({ onReady, shadows }: { onReady: () => void; 
   const parts = useMemo(() => {
     const b = (LOOK.cameraBearingDeg * Math.PI) / 180;
     const cam = new THREE.Vector3(Math.sin(b) * LOOK.cameraDistance, 0, Math.cos(b) * LOOK.cameraDistance);
-    const p = { stack: buildStack(), tower: buildTower(), site: buildSite(), ground: buildGround(), foreground: buildForeground(cam) };
+    const p = { stack: buildStack(), tower: buildTower(), site: buildSite(), ground: buildGround(), foreground: buildForeground(cam), afterglow: buildAfterglow(cam) };
     for (const o of [p.stack, p.tower, p.site])
       o.traverse((m) => {
         m.castShadow = true;
@@ -218,6 +219,7 @@ export default function GoldenShot({ onReady, shadows }: { onReady: () => void; 
   return (
     <>
       <primitive object={parts.ground} />
+      <primitive object={parts.afterglow} />
       <primitive object={parts.foreground} />
       <primitive object={parts.site} />
       <primitive object={parts.tower} />

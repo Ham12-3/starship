@@ -56,3 +56,19 @@ Still giving it away:
 
 Measured in the dev browser pane (800 x 521, small): about 16.6 ms a frame on the WebGL2 path with the full scene.
 Not yet measured at full-screen size or on a phone.
+
+### What the official SpaceX Starship page shows (viewed 13 Nov 2026)
+
+Written observations only. No images were saved or copied.
+
+- Dusk frames have a clear vertical gradient: teal above, warm peach on the horizon. Ours was one flat blue. Added an
+  afterglow band.
+- A fuelled booster really does read as a bright, pale, almost featureless column, and the ship as near-black on its
+  tiled side. Our flat pale booster is closer to right than the last self-review said.
+- The tower is open lattice all the way up, lit warm, with the catch arms spread wide like a "T" near the top when
+  empty. Ours are parked lower, around the booster top.
+- Night pad shots mix colour temperatures: orange sodium light over the tank farm, cold white floods on the stack.
+  Tank-farm lamps changed to orange.
+- Vapour around a loaded stack is heavy and billowing, lit hard by the floods. Ours is still thin.
+- Their own site uses a plain studio render of the stack on black for specs. Clean and readable: a good model for the
+  comparison chapter.
