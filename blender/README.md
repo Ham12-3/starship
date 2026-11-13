@@ -25,6 +25,25 @@ the `.blend` file.
 A quick test: `HERO_W=1280 HERO_H=720 HERO_SPP=24` takes about a minute. The full plate took about six minutes on a
 4-core laptop CPU (i5-1135G7), with no GPU.
 
+## Liftoff sequence
+
+Two shots, chained into one numbered sequence (`blender/out/liftoff_000.png` to `_055.png`):
+
+| Shot | Settings | Frames |
+|---|---|---|
+| Wide | `HERO_SEQ=-1.2,6.05,30` | 000 to 029 |
+| Engines, low camera | `HERO_SHOT=engines HERO_FLAME=7 HERO_SEQ=1.5,7.0,26 HERO_SEQ_START=30` | 030 to 055 |
+
+Both at `HERO_W=960 HERO_H=540 HERO_FLOOD=5000000`, 24 and 20 samples. Then:
+
+```
+powershell -File blender/render.ps1 -Name liftoff -TimeoutMin 120
+node scripts/make-sequence.mjs liftoff      # writes public/plates/liftoff/*.webp and data/liftoff-plate.json
+```
+
+About 100 seconds a frame on the laptop CPU. An interrupted run resumes: existing frames are skipped. Keep the
+machine awake; one run stalled for over an hour when it slept.
+
 ## Inputs
 
 - `data/rockets.json` for every dimension.

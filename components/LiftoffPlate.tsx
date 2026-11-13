@@ -7,11 +7,12 @@ import manifest from "@/data/liftoff-plate.json";
 /**
  * The launch, as a path-traced image sequence (blender/hero.py, HERO_SEQ)
  * scrubbed by scroll. Frames are loaded only when the reader gets near the
- * chapter, drawn to a canvas, and cross-faded between neighbours so a short
- * sequence still moves smoothly.
+ * chapter and drawn to a canvas one whole frame at a time. Two camera shots
+ * are chained: the wide view, then a hard cut to the low camera under the engines.
  */
-const START = CHAPTERS.findIndex((c) => c.id === "liftoff") - 0.75; // fade in before the chapter
-const END = START + 2.4; // plays across liftoff and into the next chapter
+const LIFTOFF = CHAPTERS.findIndex((c) => c.id === "liftoff");
+const START = LIFTOFF - 0.4; // fade in as the chapter arrives
+const END = LIFTOFF + 0.97; // the whole launch plays inside the Liftoff chapter
 
 export default function LiftoffPlate() {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -49,26 +50,23 @@ export default function LiftoffPlate() {
       const chapter = story.chapter;
       // Start fetching one chapter ahead, never on first paint
       if (!requested && chapter > START - 1.2) load();
-      const fade = Math.min(Math.max((chapter - START) / 0.5, 0), 1) * Math.min(Math.max((END + 0.9 - chapter) / 0.5, 0), 1);
+      const fade = Math.min(Math.max((chapter - START) / 0.4, 0), 1) * Math.min(Math.max((END + 0.45 - chapter) / 0.4, 0), 1);
       // Never cover the hero with an empty canvas: stay hidden until a frame is drawn
       el.style.opacity = (everDrawn ? fade : 0).toFixed(3);
       if (fade > 0) {
-        const u = Math.min(Math.max((chapter - START - 0.35) / (END - START - 0.35), 0), 1);
+        const u = Math.min(Math.max((chapter - LIFTOFF) / (END - LIFTOFF), 0), 1);
         // Reduced motion: three stills instead of a scrub
-        const pos = reduced ? Math.round(u * 2) * ((n - 1) / 2) : u * (n - 1);
-        if (Math.abs(pos - lastDrawn) > 0.01) {
-          const a = Math.floor(pos);
-          const b = Math.min(a + 1, n - 1);
-          const fa = frames[a];
-          const fb = frames[b];
-          if (fa) {
-            ctx.globalAlpha = 1;
-            ctx.drawImage(fa, 0, 0, cv.width, cv.height);
-            if (fb && b !== a) {
-              ctx.globalAlpha = pos - a;
-              ctx.drawImage(fb, 0, 0, cv.width, cv.height);
-            }
-            lastDrawn = pos;
+        // Whole frames only. Blending two frames ghosts anything that moves, and
+        // would turn the cut between the two camera shots into a muddy dissolve.
+        const pos = reduced ? Math.round(Math.round(u * 2) * ((n - 1) / 2)) : Math.round(u * (n - 1));
+        if (pos !== lastDrawn) {
+          // If this frame has not arrived yet, show the nearest earlier one that has
+          let k = pos;
+          while (k > 0 && !frames[k]) k--;
+          const img = frames[k];
+          if (img) {
+            ctx.drawImage(img, 0, 0, cv.width, cv.height);
+            lastDrawn = k === pos ? pos : -1;
             everDrawn = true;
           }
         }
