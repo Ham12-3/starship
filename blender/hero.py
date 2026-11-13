@@ -8,6 +8,8 @@
 #
 # Liftoff: HERO_T=<seconds after ignition> renders one frame of the launch.
 # HERO_SEQ="t0,t1,count" renders a numbered sequence in one session.
+# HERO_SHOT=engines switches to a low camera near the pad looking up at the
+# engines. HERO_SEQ_START offsets the frame numbers so shots can be chained.
 import bpy, bmesh, json, math, os, random, sys, time, traceback
 from mathutils import Matrix, Vector
 
@@ -305,7 +307,7 @@ def mat_vapour(density, scale=2.6, cut=0.42, name="vapour"):
             nt.nodes.remove(n)
     out = next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL")
     vol = N(nt, "ShaderNodeVolumePrincipled")
-    vol.inputs["Color"].default_value = (0.92, 0.94, 0.97, 1)
+    vol.inputs["Color"].default_value = (0.9, 0.87, 0.82, 1) if name == "steam" else (0.92, 0.94, 0.97, 1)
     vol.inputs["Anisotropy"].default_value = 0.35
     co = N(nt, "ShaderNodeTexCoord")
     ln = N(nt, "ShaderNodeVectorMath", operation="LENGTH")
@@ -341,10 +343,15 @@ def mat_flame():
     core = math_node(nt, "POWER", math_node(nt, "SUBTRACT", 1.0, rad, clamp=True), 1.6)
     flick = math_node(nt, "ADD", math_node(nt, "MULTIPLY", noise(nt, 3.0, 4.0, 0.6, stretch=(1.0, 1.0, 0.25)), 0.9), 0.55)
     power = math_node(nt, "MULTIPLY", math_node(nt, "MULTIPLY", core, math_node(nt, "POWER", along, 2.2)), flick)
-    col = mix_rgb(nt, along, (1.0, 0.42, 0.12), (0.72, 0.8, 1.0))
+    # shock diamonds: bright bands just under the nozzles that fade down the plume
+    band = math_node(nt, "POWER", math_node(nt, "ABSOLUTE", math_node(nt, "SINE", math_node(nt, "MULTIPLY", sp.outputs["Z"], 46.0))), 3.0)
+    diamonds = math_node(nt, "ADD", 1.0, math_node(nt, "MULTIPLY", band, math_node(nt, "MULTIPLY", math_node(nt, "POWER", along, 5.0), 3.5)))
+    power = math_node(nt, "MULTIPLY", power, diamonds)
+    col = mix_rgb(nt, math_node(nt, "POWER", along, 1.6), (1.0, 0.4, 0.1), (0.62, 0.66, 1.0))
     L(nt, col, vol.inputs["Emission Color"])
-    L(nt, math_node(nt, "MULTIPLY", power, float(os.environ.get("HERO_FLAME", 320.0))), vol.inputs["Emission Strength"])
-    L(nt, math_node(nt, "MULTIPLY", core, 0.012), vol.inputs["Density"])
+    L(nt, math_node(nt, "MULTIPLY", power, float(os.environ.get("HERO_FLAME", 3.0))), vol.inputs["Emission Strength"])
+    # glow only: any density here would scatter the plume light and turn the flame into a white solid
+    vol.inputs["Density"].default_value = 0.0
     vol.inputs["Color"].default_value = (1.0, 0.8, 0.6, 1)
     L(nt, vol.outputs["Volume"], out.inputs["Volume"])
     return m
@@ -414,6 +421,23 @@ def build_stack(M):
     # raceway up the tower side
     beam(bm, V(-(R + 0.18), 0.9, base + 8), V(-(R + 0.18), 0.9, base + BOOSTER_H - 6), 0.5, 0.3)
     obj("chines", bm, M["dark"], bevel=0.12)
+    # ---- 33 engines: 3 in the middle, 10 around them, 20 fixed in the outer ring
+    be = bmesh.new()
+    bg2 = bmesh.new()
+    for count, radius in ((3, 0.86), (10, 2.25), (20, 3.9)):
+        for i in range(count):
+            a = 2 * math.pi * i / count + (0.3 if count == 10 else 0.0)
+            x, y = math.cos(a) * radius, math.sin(a) * radius
+            # bell: 1.3 m across at the exit, as on the real engine
+            bmesh.ops.create_cone(be, cap_ends=False, segments=20, radius1=0.65, radius2=0.2, depth=1.7, matrix=Matrix.Translation((x, y, base - 0.75)))
+            tube(be, V(x, y, base + 0.1), V(x, y, base + 0.9), 0.32, 12)
+            # the glow inside the bell
+            bmesh.ops.create_circle(bg2, cap_ends=True, segments=16, radius=0.6, matrix=Matrix.Translation((x, y, base - 1.5)))
+    tube(be, V(0, 0, base + 0.2), V(0, 0, base + 0.5), R - 0.1, 64)  # aft dome
+    obj("engines", be, M["engine"], smooth=True)
+    glow = obj("engine_glow", bg2, M["engine_glow"])
+    glow.hide_render = not LIFTOFF
+
     # ---- grid fins: real lattice, three of them, none on the tower side
     for k, a in enumerate((0.0, math.pi / 2, -math.pi / 2)):
         bm = bmesh.new()
@@ -799,6 +823,7 @@ def build_site(M):
 MASTS = [(78, -92), (-72, -84), (104, 70), (-88, 64)]
 
 LIFTOFF = bool(os.environ.get("HERO_T") or os.environ.get("HERO_SEQ"))
+SHOT = os.environ.get("HERO_SHOT", "wide")
 
 
 def smooth(x):
@@ -830,6 +855,10 @@ class Launch:
             self.steam.append((o, a, r2.uniform(0.75, 1.25), r2.uniform(0, 6.28), i == 10))
         self.cam = scene.camera
         self.cam_target_z = float(os.environ.get("HERO_TZ", 84))
+        if SHOT == "engines":
+            # A remote camera on the pad apron: low, close, wide lens, looking up
+            self.cam.location = (float(os.environ.get("HERO_CX", 58)), float(os.environ.get("HERO_CY", -150)), float(os.environ.get("HERO_CZ", 9)))
+            self.cam.data.lens = float(os.environ.get("HERO_LENS", 52.0))
 
     def set(self, t):
         # About 1.5 g of thrust: slow off the pad, then quickly away
@@ -857,7 +886,13 @@ class Launch:
             o.hide_render = burn <= 0.01
         # the camera stops down as the plume lights, and tilts up to follow
         self.scene.view_settings.exposure = float(os.environ.get("HERO_EXPOSURE", 0.75)) - 2.0 * burn
-        target = V(float(os.environ.get("HERO_TX", -62)), 0, self.cam_target_z + lift * 0.8)
+        if SHOT == "engines":
+            # follow the engines, a little late, so the fire stays in frame
+            # keep the engines in the upper third so the fire fills the frame below them
+            target = V(0, 0, PAD_H - 9 + lift * 0.96)
+            self.scene.view_settings.exposure -= 1.3
+        else:
+            target = V(float(os.environ.get("HERO_TX", -62)), 0, self.cam_target_z + lift * 0.8)
         self.cam.rotation_euler = (target - self.cam.location).to_track_quat("-Z", "Y").to_euler()
         return lift
 
@@ -968,6 +1003,8 @@ def main():
         "vapour": mat_vapour(float(os.environ.get("HERO_VAPOUR", 0.05))),
         "steam": mat_vapour(float(os.environ.get("HERO_STEAM", 0.55)), scale=3.4, cut=0.5, name="steam"),
         "flame": mat_flame(),
+        "engine": mat_paint("engine", (0.07, 0.06, 0.055), rough=0.45, metal=0.9, grime=0.8),
+        "engine_glow": mat_plain("engine_glow", (0.75, 0.8, 1.0), emit=float(os.environ.get("HERO_GLOW", 2500.0))),
         "scrub": mat_paint("scrub", (0.03, 0.04, 0.018), rough=0.95, grime=0.3),
         "road": mat_paint("road", (0.05, 0.05, 0.052), rough=0.8, grime=0.2),
         "ground": mat_ground(),
@@ -991,7 +1028,8 @@ def main():
         if os.environ.get("HERO_SEQ"):
             a, b, n = os.environ["HERO_SEQ"].split(",")
             a, b, n = float(a), float(b), int(n)
-            frames = [(i, a + (b - a) * i / (n - 1)) for i in range(n)]
+            start = int(os.environ.get("HERO_SEQ_START", 0))
+            frames = [(start + i, a + (b - a) * i / (n - 1)) for i in range(n)]
         else:
             frames = [(None, float(os.environ["HERO_T"]))]
         for i, t in frames:

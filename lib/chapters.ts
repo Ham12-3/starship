@@ -1,10 +1,18 @@
 // The story spine. One chapter = one unit on the Theatre.js sequence.
 export type Tier = "A" | "B" | "B+C" | "-";
 
+/** A short line of copy that scrolls past on one side of the picture. */
+export interface Beat {
+  side: "left" | "right";
+  kicker?: string;
+  text: string;
+}
+
 export interface Chapter {
   id: string; // deep link: /#liftoff
   label: string;
   tier: Tier;
+  beats?: Beat[];
 }
 
 export const CHAPTERS: Chapter[] = [
@@ -38,4 +46,9 @@ export const SEQUENCE_LENGTH = CHAPTERS.length - 1;
 export const story = {
   /** 0..1 across the whole page */
   progress: 0,
+  /**
+   * Position in chapters, with a fraction: 7.5 is halfway through chapter 7.
+   * Measured from the real section positions, so chapters can differ in length.
+   */
+  chapter: 0,
 };

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { CHAPTERS, LAUNCH_CHAPTER, story } from "@/lib/chapters";
+import { CHAPTERS, LAUNCH_CHAPTER, story, type Beat } from "@/lib/chapters";
 import rockets from "@/data/rockets.json";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -54,13 +54,26 @@ export default function Story() {
       settling = false;
     }, 150);
 
+    let tops: number[] = [0];
+    const measure = () => {
+      tops = CHAPTERS.map((ch) => document.getElementById(ch.id)?.offsetTop ?? 0);
+    };
+    measure();
+
     const trigger = ScrollTrigger.create({
       trigger: root.current,
       start: "top top",
       end: "bottom bottom",
+      onRefresh: measure,
       onUpdate: (self) => {
         story.progress = self.progress;
-        const i = Math.round(self.progress * (CHAPTERS.length - 1));
+        // Which section is at the top of the screen, and how far through it we are
+        const y = window.scrollY;
+        let k = 0;
+        while (k < tops.length - 1 && y >= tops[k + 1]) k++;
+        const next = k < tops.length - 1 ? tops[k + 1] : tops[k] + 1;
+        story.chapter = k + Math.min(Math.max((y - tops[k]) / Math.max(next - tops[k], 1), 0), 1);
+        const i = Math.round(story.chapter);
         if (i !== activeRef.current) {
           activeRef.current = i;
           setActive(i);
@@ -93,6 +106,15 @@ export default function Story() {
   }, []);
 
   const height = rockets.hero.stackHeight.value;
+  const hero = rockets.hero;
+  // Copy for the launch, built from the data file so no number is typed twice
+  const liftoffBeats: Beat[] = [
+    { side: "right", kicker: "Ignition", text: `${hero.boosterEngines.value} engines light, a few at a time.` },
+    { side: "left", kicker: "T+0:00:00", text: "The clamps let go. Liftoff." },
+    { side: "right", kicker: "Thrust", text: `About ${Math.round(hero.boosterLiftoffThrust.value / 10) * 10} meganewtons. More than any rocket before it.` },
+    { side: "left", kicker: "The white cloud", text: "Mostly steam. Water floods the pad to protect it from the fire." },
+    { side: "right", kicker: "Weight", text: `About ${hero.liftoffMass.value.toLocaleString("en-US")} tonnes, rising on a column of fire.` },
+  ];
 
   return (
     <>
@@ -108,10 +130,18 @@ export default function Story() {
                 <p className="cue">Scroll to begin</p>
               </div>
             ) : (
-              <div className="copy">
-                <p className="eyebrow">Chapter {i}</p>
-                <h2>{c.label}</h2>
-              </div>
+              <>
+                <div className={`copy passing ${i % 2 ? "left" : "right"}`}>
+                  <p className="eyebrow">Chapter {i}</p>
+                  <h2>{c.label}</h2>
+                </div>
+                {(c.id === "liftoff" ? liftoffBeats : (c.beats ?? [])).map((b, k) => (
+                  <div key={k} className={`copy passing beat ${b.side}`}>
+                    {b.kicker && <p className="eyebrow">{b.kicker}</p>}
+                    <p className="lede">{b.text}</p>
+                  </div>
+                ))}
+              </>
             )}
           </section>
         ))}

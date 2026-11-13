@@ -29,6 +29,7 @@ export default function LiftoffPlate() {
     let requested = false;
     let raf = 0;
     let lastDrawn = -1;
+    let everDrawn = false;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const load = () => {
@@ -45,11 +46,12 @@ export default function LiftoffPlate() {
     };
 
     const tick = () => {
-      const chapter = story.progress * (CHAPTERS.length - 1);
+      const chapter = story.chapter;
       // Start fetching one chapter ahead, never on first paint
       if (!requested && chapter > START - 1.2) load();
       const fade = Math.min(Math.max((chapter - START) / 0.5, 0), 1) * Math.min(Math.max((END + 0.9 - chapter) / 0.5, 0), 1);
-      el.style.opacity = fade.toFixed(3);
+      // Never cover the hero with an empty canvas: stay hidden until a frame is drawn
+      el.style.opacity = (everDrawn ? fade : 0).toFixed(3);
       if (fade > 0) {
         const u = Math.min(Math.max((chapter - START - 0.35) / (END - START - 0.35), 0), 1);
         // Reduced motion: three stills instead of a scrub
@@ -67,6 +69,7 @@ export default function LiftoffPlate() {
               ctx.drawImage(fb, 0, 0, cv.width, cv.height);
             }
             lastDrawn = pos;
+            everDrawn = true;
           }
         }
       }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CHAPTERS, story } from "@/lib/chapters";
+import { story } from "@/lib/chapters";
 
 /**
  * The hero as a path-traced plate (blender/hero.py) with a thin live layer on
@@ -47,7 +47,7 @@ export default function HeroPlate() {
     const start = performance.now();
     const tick = (now: number) => {
       const t = (now - start) / 1000;
-      const chapter = story.progress * (CHAPTERS.length - 1);
+      const chapter = story.chapter;
       // Push in over the first two chapters, then hold; a drone never sits perfectly still.
       const push = 1 + 0.07 * Math.min(chapter / 2, 1);
       const dx = Math.sin(t * 0.21) * 0.12 + Math.sin(t * 0.53 + 1.3) * 0.06;
