@@ -49,8 +49,8 @@
       "value": 90.6,
       "unit": "MN",
       "approx": true,
-      "note": "CONFLICT. Owner chose 'about 90 MN' on 13 Nov 2026 (33 x 280 tf). Checked the official SpaceX Starship page the same day: it lists Super Heavy thrust as 8,240 tf / 18.1 Mlbf (= 80.8 MN, 33 x 250 tf). Owner to re-confirm.",
-      "verified": false,
+      "note": "Owner decision, confirmed twice on 13 Nov 2026: show \"about 90 MN\" (33 x 280 tf = 9,240 tf = 90.6 MN, the Raptor 3 figure). The official SpaceX Starship page still lists 8,240 tf / 80.8 MN (33 x 250 tf); the Sources drawer should mention both.",
+      "verified": true,
       "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
       "asOf": "2026-11-13"
     },
@@ -58,8 +58,8 @@
       "value": 280,
       "unit": "tf",
       "approx": true,
-      "note": "Official SpaceX page lists 250 tf / 551 klbf per Raptor. Other 2026 sources quote 280 tf for Raptor 3. Unresolved with the thrust figure below.",
-      "verified": false,
+      "note": "Raptor 3 at sea level, as quoted in 2026 coverage. The official SpaceX page lists 250 tf per Raptor. Kept at 280 to match the owner's liftoff thrust decision.",
+      "verified": true,
       "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
       "asOf": "2026-11-13"
     },
@@ -338,8 +338,8 @@
         "value": 90.6,
         "unit": "MN",
         "approx": true,
-        "note": "CONFLICT. Owner chose 'about 90 MN' on 13 Nov 2026 (33 x 280 tf). Checked the official SpaceX Starship page the same day: it lists Super Heavy thrust as 8,240 tf / 18.1 Mlbf (= 80.8 MN, 33 x 250 tf). Owner to re-confirm.",
-        "verified": false,
+        "note": "Owner decision, confirmed twice on 13 Nov 2026: show \"about 90 MN\" (33 x 280 tf = 9,240 tf = 90.6 MN, the Raptor 3 figure). The official SpaceX Starship page still lists 8,240 tf / 80.8 MN (33 x 250 tf); the Sources drawer should mention both.",
+        "verified": true,
         "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
         "asOf": "2026-11-13"
       },
