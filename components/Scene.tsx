@@ -10,6 +10,7 @@ import { getCameraObject, seek } from "@/lib/timeline";
 import { TIERS, type TierName } from "@/lib/quality";
 
 const FULL_FRAME_WIDTH_MM = 36;
+const SENSOR_HEIGHT_MM = (FULL_FRAME_WIDTH_MM * 9) / 16;
 const DEG = Math.PI / 180;
 
 /**
@@ -40,7 +41,14 @@ function CameraRig() {
     const dy = (Math.sin(t * 0.17 + 2.1) + 0.5 * Math.sin(t * 0.61) + 0.12 * Math.sin(t * 8.3 + 0.4)) * wander;
     const px = dx + v.pan; // pan: metres left or right of the pad, at the pad
     camera.lookAt(px * Math.cos(b), v.lookHeight + dy, -px * Math.sin(b));
-    if (camera.getFocalLength() !== v.focalLength) camera.setFocalLength(v.focalLength);
+    // Focal lengths are for a 16:9 crop of a full-frame sensor (20.25 mm tall).
+    // Fixing the vertical angle keeps the stack framed the same on any screen
+    // shape: wider screens see more to the sides, never less top to bottom.
+    const fov = (2 * Math.atan(SENSOR_HEIGHT_MM / 2 / v.focalLength)) / DEG;
+    if (Math.abs(camera.fov - fov) > 1e-5) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
   }, -1);
 
   return null;

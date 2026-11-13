@@ -181,3 +181,13 @@ h2 {
     transition: none !important;
   }
 }
+
+/* /?clean hides every overlay so the stage can be captured as a plate */
+html[data-clean] .story,
+html[data-clean] .dots,
+html[data-clean] .skip,
+html[data-clean] .debug,
+html[data-clean] .legal,
+html[data-clean] nextjs-portal {
+  visibility: hidden;
+}

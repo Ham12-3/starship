@@ -11,7 +11,7 @@ import { TIERS, type TierName } from "@/lib/quality";
 
 export const GRADE = {
   /** Heat shimmer, in screen fractions. Strongest near the ground. */
-  shimmer: 0.0011,
+  shimmer: 0.0006,
   chromaticAberration: 0.004,
   bloomStrength: 0.55,
   bloomRadius: 0.5,

@@ -37,6 +37,7 @@ export default function Experience() {
     const override = tierOverride();
     pinned.current = override !== null;
     setTier(override ?? guessTier(readHints()));
+    if (new URLSearchParams(location.search).has("clean")) document.documentElement.dataset.clean = "";
     void maybeLoadStudio();
   }, []);
 
