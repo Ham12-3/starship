@@ -10,6 +10,11 @@
 # HERO_SEQ="t0,t1,count" renders a numbered sequence in one session.
 # HERO_SHOT=engines switches to a low camera near the pad looking up at the
 # engines. HERO_SEQ_START offsets the frame numbers so shots can be chained.
+#
+# HERO_SCENE=space renders in space with a transparent background, to be laid
+# over a NASA photo on the site. HERO_SHOT is then staging (chase camera at hot
+# staging), onboard (camera on the ship looking back at the falling booster) or
+# deploy (Starlink satellites leaving the payload door). HERO_SEQ is in seconds.
 import bpy, bmesh, json, math, os, random, sys, time, traceback
 from mathutils import Matrix, Vector
 
@@ -151,7 +156,7 @@ def noise(nt, scale, detail=6.0, rough=0.6, vec=None, stretch=None):
     return n.outputs["Fac"]
 
 
-def mat_steel(name, frost_bands, soot_to=0.0):
+def mat_steel(name, frost_bands, soot_to=0.0, ring_from=PAD_H):
     """Stainless skin. Per-ring variation from the face attribute "rr", frost by height."""
     m = bpy.data.materials.new(name)
     nt, b = nodes_of(m)
@@ -164,10 +169,10 @@ def mat_steel(name, frost_bands, soot_to=0.0):
     streak = noise(nt, 1.0, 8.0, 0.65, stretch=(9.0, 9.0, 0.22))  # vertical run marks
     blotch = noise(nt, 0.35, 4.0, 0.5)
     # roughness: rings differ, streaks and blotches break it up
-    rough = math_node(nt, "ADD", math_node(nt, "MULTIPLY", rr, 0.22), 0.2)
+    rough = math_node(nt, "ADD", math_node(nt, "MULTIPLY", rr, 0.07), 0.25)
     rough = math_node(nt, "ADD", rough, math_node(nt, "MULTIPLY", streak, 0.16))
     rough = math_node(nt, "ADD", rough, math_node(nt, "MULTIPLY", blotch, 0.1))
-    base = mix_rgb(nt, rr, (0.50, 0.51, 0.53), (0.66, 0.67, 0.69))
+    base = mix_rgb(nt, rr, (0.56, 0.57, 0.59), (0.62, 0.63, 0.65))
     base = mix_rgb(nt, math_node(nt, "MULTIPLY", streak, 0.35), base, (0.33, 0.33, 0.35))
     # frost mask: union of height bands with a ragged, noisy edge
     edge = math_node(nt, "MULTIPLY", math_node(nt, "SUBTRACT", noise(nt, 0.9, 5.0, 0.6), 0.5), 1.6)
@@ -200,7 +205,18 @@ def mat_steel(name, frost_bands, soot_to=0.0):
     bump.inputs["Strength"].default_value = 0.35
     bump.inputs["Distance"].default_value = 0.08
     L(nt, noise(nt, 0.55, 2.0, 0.4, stretch=(1.0, 1.0, 0.5)), bump.inputs["Height"])
-    L(nt, bump.outputs["Normal"], b.inputs["Normal"])
+    w = N(nt, "ShaderNodeMath", operation="WRAP")
+    L(nt, math_node(nt, "SUBTRACT", zz, ring_from), w.inputs[0])
+    w.inputs[1].default_value = RING
+    w.inputs[2].default_value = 0.0
+    d = math_node(nt, "MINIMUM", w.outputs[0], math_node(nt, "SUBTRACT", RING, w.outputs[0]))
+    weld = math_node(nt, "SUBTRACT", 1.0, math_node(nt, "DIVIDE", d, 0.03), clamp=True)
+    bump2 = N(nt, "ShaderNodeBump")
+    bump2.inputs["Strength"].default_value = 0.6
+    bump2.inputs["Distance"].default_value = 0.02
+    L(nt, weld, bump2.inputs["Height"])
+    L(nt, bump.outputs["Normal"], bump2.inputs["Normal"])
+    L(nt, bump2.outputs["Normal"], b.inputs["Normal"])
     return m
 
 
@@ -321,7 +337,7 @@ def mat_vapour(density, scale=2.6, cut=0.42, name="vapour"):
     return m
 
 
-def mat_flame():
+def mat_flame(density=0.0):
     """Methalox plume: blue-white and very bright at the nozzles, fading to thin orange."""
     m = bpy.data.materials.new("flame")
     try:
@@ -350,9 +366,14 @@ def mat_flame():
     col = mix_rgb(nt, math_node(nt, "POWER", along, 1.6), (1.0, 0.4, 0.1), (0.62, 0.66, 1.0))
     L(nt, col, vol.inputs["Emission Color"])
     L(nt, math_node(nt, "MULTIPLY", power, float(os.environ.get("HERO_FLAME", 3.0))), vol.inputs["Emission Strength"])
-    # glow only: any density here would scatter the plume light and turn the flame into a white solid
-    vol.inputs["Density"].default_value = 0.0
-    vol.inputs["Color"].default_value = (1.0, 0.8, 0.6, 1)
+    # No scattering: it would turn the flame into a white solid. Over a transparent
+    # background (space shots) a little pure absorption is needed, or the glow has
+    # no opacity and is lost wherever nothing solid is behind it.
+    vol.inputs["Color"].default_value = (0, 0, 0, 1)
+    if density:
+        L(nt, math_node(nt, "MULTIPLY", core, density), vol.inputs["Density"])
+    else:
+        vol.inputs["Density"].default_value = 0.0
     L(nt, vol.outputs["Volume"], out.inputs["Volume"])
     return m
 
@@ -392,7 +413,7 @@ def ringed_profile(z0, z1, radius_at, rid0=0):
     while z < z1 - 1e-6:
         top = min(z + RING, z1)
         r0, r1 = radius_at(z), radius_at(top)
-        pts += [(r0, z + 0.02, rid), (r1, top - 0.04, rid), (r1 + 0.014, top - 0.01, rid)]
+        pts += [(r0, z + 0.02, rid), (r1, top - 0.02, rid)]
         z, rid = top, rid + 1
     pts.insert(0, (radius_at(z0), z0, rid0))
     pts.append((radius_at(z1), z1, rid - 1))
@@ -488,6 +509,33 @@ def build_stack(M):
         return abs(d) < math.radians(97)
 
     shell("ship", prof, [M["ship"], M["tiles"]], tile_test=windward)
+    # six engines: three sea-level (1.3 m bells) inside, three vacuum (2.3 m) outside
+    bse = bmesh.new()
+    bsg = bmesh.new()
+    for i in range(3):
+        a = 2 * math.pi * i / 3
+        x, y = math.cos(a) * 1.25, math.sin(a) * 1.25
+        bmesh.ops.create_cone(bse, cap_ends=False, segments=24, radius1=0.65, radius2=0.22, depth=1.7, matrix=Matrix.Translation((x, y, sb - 0.85)))
+        bmesh.ops.create_circle(bsg, cap_ends=True, segments=16, radius=0.6, matrix=Matrix.Translation((x, y, sb - 1.62)))
+        a2 = a + math.pi / 3
+        x, y = math.cos(a2) * 3.05, math.sin(a2) * 3.05
+        bmesh.ops.create_cone(bse, cap_ends=False, segments=32, radius1=1.15, radius2=0.3, depth=3.2, matrix=Matrix.Translation((x, y, sb - 1.6)))
+        bmesh.ops.create_circle(bsg, cap_ends=True, segments=20, radius=1.08, matrix=Matrix.Translation((x, y, sb - 3.12)))
+    tube(bse, V(0, 0, sb - 0.1), V(0, 0, sb + 0.3), R - 0.15, 64)
+    obj("ship_engines", bse, M["engine"], smooth=True)
+    sg = obj("ship_glow", bsg, M["engine_glow"])
+    sg.hide_render = True
+    # payload door: the slot Starlink satellites leave through, on the leeward side
+    bd = bmesh.new()
+    zd = sb + 24.5
+    slab(bd, V(-(R - 0.05), 0, zd), 0.5, 6.0, 2.5)
+    obj("ship_door", bd, M["slot"])
+    bf = bmesh.new()
+    for dy in (-3.1, 3.1):
+        beam(bf, V(-(R + 0.04), dy, zd - 1.35), V(-(R + 0.04), dy, zd + 1.35), 0.12, 0.18)
+    for dz in (-1.35, 1.35):
+        beam(bf, V(-(R + 0.04), -3.1, zd + dz), V(-(R + 0.04), 3.1, zd + dz), 0.12, 0.18)
+    obj("ship_doorframe", bf, M["dark"])
     # flaps: hinged on the line between steel and tiles, swept a little leeward
     def flap(name, z0, span, height, taper, ang):
         bm = bmesh.new()
@@ -822,6 +870,332 @@ def build_site(M):
 
 MASTS = [(78, -92), (-72, -84), (104, 70), (-88, 64)]
 
+SCENE = os.environ.get("HERO_SCENE", "pad")
+SHOT = os.environ.get("HERO_SHOT", "wide")
+
+
+def mat_flare():
+    """Hot-staging fire bursting sideways out of the vent ring: orange, ragged, brightest at the ring."""
+    m = bpy.data.materials.new("flare")
+    try:
+        m.use_nodes = True
+    except Exception:
+        pass
+    nt = m.node_tree
+    for n in list(nt.nodes):
+        if n.type != "OUTPUT_MATERIAL":
+            nt.nodes.remove(n)
+    out = next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL")
+    vol = N(nt, "ShaderNodeVolumePrincipled")
+    co = N(nt, "ShaderNodeTexCoord")
+    sp = N(nt, "ShaderNodeSeparateXYZ")
+    L(nt, co.outputs["Object"], sp.inputs[0])
+    rad = math_node(nt, "SQRT", math_node(nt, "ADD", math_node(nt, "POWER", sp.outputs["X"], 2.0), math_node(nt, "POWER", sp.outputs["Y"], 2.0)))
+    # zero inside the rocket (radius < 0.45 of the volume), peak at the skin, fading outward
+    ring = math_node(nt, "MULTIPLY", math_node(nt, "GREATER_THAN", rad, 0.42), math_node(nt, "POWER", math_node(nt, "SUBTRACT", 1.0, rad, clamp=True), 1.3))
+    thin = math_node(nt, "SUBTRACT", 1.0, math_node(nt, "MULTIPLY", math_node(nt, "ABSOLUTE", sp.outputs["Z"]), 2.0), clamp=True)
+    rag = math_node(nt, "SUBTRACT", noise(nt, 2.2, 5.0, 0.65), 0.3, clamp=True)
+    e = math_node(nt, "MULTIPLY", math_node(nt, "MULTIPLY", ring, thin), rag)
+    vol.inputs["Emission Color"].default_value = (1.0, 0.45, 0.12, 1)
+    L(nt, math_node(nt, "MULTIPLY", e, float(os.environ.get("HERO_FLARE", 120.0))), vol.inputs["Emission Strength"])
+    vol.inputs["Color"].default_value = (0, 0, 0, 1)
+    L(nt, math_node(nt, "MULTIPLY", e, 0.35), vol.inputs["Density"])
+    L(nt, vol.outputs["Volume"], out.inputs["Volume"])
+    return m
+
+
+def mat_solar():
+    m = bpy.data.materials.new("solar")
+    nt, b = nodes_of(m)
+    co = N(nt, "ShaderNodeTexCoord")
+    br = N(nt, "ShaderNodeTexBrick", offset=0.0)
+    L(nt, co.outputs["Object"], br.inputs["Vector"])
+    br.inputs["Scale"].default_value = 3.0
+    br.inputs["Mortar Size"].default_value = 0.01
+    br.inputs["Brick Width"].default_value = 0.5
+    br.inputs["Row Height"].default_value = 0.5
+    br.inputs["Color1"].default_value = (0.01, 0.014, 0.03, 1)
+    br.inputs["Color2"].default_value = (0.014, 0.018, 0.04, 1)
+    br.inputs["Mortar"].default_value = (0.3, 0.3, 0.32, 1)
+    L(nt, br.outputs["Color"], b.inputs["Base Color"])
+    b.inputs["Roughness"].default_value = 0.18
+    b.inputs["Metallic"].default_value = 0.4
+    return m
+
+
+def mat_foil():
+    m = bpy.data.materials.new("foil")
+    nt, b = nodes_of(m)
+    b.inputs["Base Color"].default_value = (0.75, 0.72, 0.62, 1)
+    b.inputs["Metallic"].default_value = 1.0
+    L(nt, math_node(nt, "ADD", math_node(nt, "MULTIPLY", noise(nt, 2.0, 6.0, 0.7), 0.35), 0.12), b.inputs["Roughness"])
+    bump = N(nt, "ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.7
+    L(nt, noise(nt, 4.0, 8.0, 0.7), bump.inputs["Height"])
+    L(nt, bump.outputs["Normal"], b.inputs["Normal"])
+    return m
+
+
+def rig(name, pivot, objs):
+    """Empty that moves a group of objects that were built in place.
+    child world = rig.matrix_world @ T(-pivot) @ child_built"""
+    e = bpy.data.objects.new(name, None)
+    bpy.context.scene.collection.objects.link(e)
+    inv = Matrix.Translation(-Vector(pivot))
+    for o in objs:
+        o.parent = e
+        o.matrix_parent_inverse = inv
+    return e
+
+
+class Space:
+    """Hot staging, the onboard view and the satellite deploy, all in one rig."""
+
+    def __init__(self, scene, M, stack_objs):
+        self.scene = scene
+        ship_names = ("ship", "aftflap", "fwdflap")
+        ship = [o for o in stack_objs if o.name.startswith(ship_names)]
+        boost = [o for o in stack_objs if o not in ship]
+        self.sb = PAD_H + BOOSTER_H
+        self.ship_c = V(0, 0, self.sb + 26.0)
+        self.boost_c = V(0, 0, PAD_H + 36.0)
+        self.glow = bpy.data.objects["ship_glow"]
+        bpy.data.objects["engine_glow"].hide_render = True  # booster engines are off by staging
+        # ship plume and the hot-staging flash, built in the stacked position
+        bm = bmesh.new()
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=32, radius1=1.0, radius2=0.42, depth=1.0)
+        self.plume = obj("ship_plume", bm, M["flame"])
+        ld = bpy.data.lights.new("flash", "POINT")
+        ld.color = (1.0, 0.55, 0.22)
+        ld.shadow_soft_size = 3.0
+        self.flash = bpy.data.objects.new("flash", ld)
+        scene.collection.objects.link(self.flash)
+        self.flash.location = (0, 0, self.sb - 1.2)
+        bm = bmesh.new()
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=48, radius1=1.0, radius2=1.0, depth=1.0)
+        self.flare = obj("flare", bm, M["flare"])
+        self.flare.location = V(0, 0, self.sb - 1.2)
+        # glow you can see, but not a light source: it would flood the booster white
+        for o in (self.plume, self.flare):
+            o.visible_diffuse = False
+            o.visible_glossy = False
+            o.visible_transmission = False
+            o.visible_shadow = False
+            o.visible_volume_scatter = False
+        self.ship = rig("ShipRig", self.ship_c, ship + [self.plume, self.flash])
+        self.boost = rig("BoosterRig", self.boost_c, boost + [self.flare])
+        self.sats = []
+        if SHOT == "deploy":
+            self.build_sats(M)
+            self.boost.hide_render = True
+            for o in boost:
+                o.hide_render = True
+
+    def build_sats(self, M):
+        zd = self.sb + 24.5
+        for k in range(7):
+            b = bmesh.new()
+            slab(b, V(0, 0, 0), 6.2, 2.3, 0.22)
+            body = obj("sat%d" % k, b, M["foil"])
+            b2 = bmesh.new()
+            slab(b2, V(0, 0, 0.16), 6.0, 2.2, 0.08)
+            top = obj("sat%d_solar" % k, b2, M["solar"])
+            top.parent = body
+            body.parent = self.ship
+            body.matrix_parent_inverse = Matrix.Translation(-self.ship_c)
+            # stacked inside the bay, flat side toward the door, solar panel facing out
+            body.rotation_euler = (0, math.radians(-90), 0)
+            body.location = V(-(R - 1.2) + k * 0.36, 0, zd)
+            self.sats.append(body)
+
+    def stack_pose(self, d_ship, d_boost, flip_deg, pitch_deg=55.0):
+        P = Matrix.Rotation(math.radians(pitch_deg), 4, "Y") @ Matrix.Translation(V(0, 0, -self.sb))
+        self.ship.matrix_world = P @ Matrix.Translation(V(0, 0, d_ship)) @ Matrix.Translation(self.ship_c)
+        self.boost.matrix_world = P @ Matrix.Translation(V(0, 0, d_boost)) @ Matrix.Translation(self.boost_c) @ Matrix.Rotation(math.radians(flip_deg), 4, "Y")
+
+    def burn(self, power, gap):
+        self.glow.hide_render = power < 0.01
+        # seen from right behind the engines the plume washes the frame out; the onboard view shows the bells only
+        self.plume.hide_render = power < 0.01 or SHOT == "onboard"
+        length = min(6 + 72 * smooth((gap - 1.5) / 40.0), max(gap - 6.0, 6.0))
+        sx = 12.0
+        self.plume.scale = (sx, sx, length)
+        self.plume.location = V(0, 0, self.sb - 2.6 - length / 2)
+
+    def set(self, t):
+        if SHOT == "deploy":
+            return self.set_deploy(t)
+        # t = 0: ship engines at full thrust inside the hot-staging ring
+        power = smooth((t + 0.6) / 0.6)
+        ts = max(t - 0.6, 0.0)
+        d_ship = 0.5 * 9.0 * ts * ts
+        d_boost = -0.5 * 3.0 * ts * ts
+        flip = -7.0 * max(t - 1.2, 0.0) - 0.6 * max(t - 1.2, 0.0) ** 2
+        self.stack_pose(d_ship, d_boost, flip)
+        gap = d_ship - d_boost
+        self.burn(power, gap)
+        # the flash through the vents is brightest while the ship is still in the ring
+        vent = power * (1 - smooth((gap - 2.0) / 14.0))
+        self.flash.data.energy = float(os.environ.get("HERO_FLASH", 4.0e7)) * vent
+        self.flare.hide_render = vent < 0.02
+        size = R * (2.2 + 2.5 * smooth(t + 0.6))
+        self.flare.scale = (size, size, 5.0 + 4.0 * vent)
+        # fade by shrinking the bright band toward the skin
+        if vent < 1.0:
+            self.flare.scale = (R * (1.0 + 1.2 * vent) + 1.0, R * (1.0 + 1.2 * vent) + 1.0, 2.0 + 7.0 * vent)
+        return gap
+
+    def set_deploy(self, t):
+        # ship broadside over the Earth, door toward the camera
+        R3 = Matrix(((0, 0, 1), (1, 0, 0), (0, 1, 0))).to_4x4()
+        self.ship.matrix_world = R3
+        self.plume.hide_render = True
+        self.glow.hide_render = True
+        self.flash.data.energy = 0
+        zd = self.sb + 24.5
+        for k, sat in enumerate(self.sats):
+            t0 = 0.6 + k * 1.15  # one every second or so
+            u = t - t0
+            if u < 0:
+                sat.location = V(-(R - 1.2) + k * 0.36, 0, zd)
+                sat.rotation_euler = (0, math.radians(-90), 0)
+                continue
+            out = min(u, 1.2) * 6.5 + max(u - 1.2, 0) * 2.4  # pushed out, then drifting
+            sat.location = V(-(R - 1.2) - out, -0.5 * max(u - 1.0, 0) ** 1.4, zd - 1.4 * max(u - 1.0, 0))
+            sat.rotation_euler = (0.05 * u * (1 + k % 3), math.radians(90) + 0.08 * u, 0.04 * u * (k % 2 * 2 - 1))
+        return t
+
+
+def setup_space(scene):
+    w = int(os.environ.get("HERO_W", 1280))
+    h = int(os.environ.get("HERO_H", 720))
+    scene.render.engine = "CYCLES"
+    scene.cycles.device = "CPU"
+    scene.cycles.samples = int(os.environ.get("HERO_SPP", 24))
+    scene.cycles.use_adaptive_sampling = True
+    scene.cycles.adaptive_threshold = 0.03
+    scene.cycles.use_denoising = True
+    scene.cycles.max_bounces = 4
+    scene.cycles.volume_bounces = 0
+    scene.cycles.volume_step_rate = 8.0
+    scene.cycles.volume_max_steps = 64
+    scene.render.resolution_x, scene.render.resolution_y = w, h
+    scene.render.resolution_percentage = 100
+    scene.render.film_transparent = True  # laid over a NASA photo on the site
+    scene.view_settings.view_transform = "AgX"
+    try:
+        scene.view_settings.look = "AgX - Medium High Contrast"
+    except Exception:
+        pass
+    scene.view_settings.exposure = float(os.environ.get("HERO_EXPOSURE", 0.0))
+    # world: black sky above, bright cloud-covered Earth below, for reflections only
+    world = bpy.data.worlds.new("space")
+    scene.world = world
+    try:
+        world.use_nodes = True
+    except Exception:
+        pass
+    nt = world.node_tree
+    bg = next(n for n in nt.nodes if n.type == "BACKGROUND")
+    co = N(nt, "ShaderNodeTexCoord")
+    sp = N(nt, "ShaderNodeSeparateXYZ")
+    L(nt, co.outputs["Generated"], sp.inputs[0])
+    mr = N(nt, "ShaderNodeMapRange")
+    mr.inputs["From Min"].default_value = -0.12
+    mr.inputs["From Max"].default_value = 0.03
+    mr.inputs["To Min"].default_value = 1.0
+    mr.inputs["To Max"].default_value = 0.0
+    L(nt, sp.outputs["Z"], mr.inputs["Value"])
+    col = mix_rgb(nt, mr.outputs["Result"], (0.0, 0.0, 0.0), (0.36, 0.46, 0.62))
+    L(nt, col, bg.inputs["Color"])
+    bg.inputs["Strength"].default_value = float(os.environ.get("HERO_EARTHSHINE", 1.4))
+    # the Sun: a hard, small source
+    sd = bpy.data.lights.new("sun", "SUN")
+    sd.energy = float(os.environ.get("HERO_SUN", 4.5))
+    sd.angle = math.radians(0.53)
+    sun = bpy.data.objects.new("sun", sd)
+    scene.collection.objects.link(sun)
+    d = Vector((float(x) for x in os.environ.get("HERO_SUNDIR", "0.55,0.65,-0.45").split(","))).normalized()
+    sun.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
+    cd = bpy.data.cameras.new("cam")
+    cd.sensor_width = 36.0
+    cd.clip_start, cd.clip_end = 0.5, 50000.0
+    cam = bpy.data.objects.new("cam", cd)
+    scene.collection.objects.link(cam)
+    scene.camera = cam
+    return cam
+
+
+def place_space_camera(cam, space):
+    if SHOT == "staging":
+        cam.data.lens = float(os.environ.get("HERO_LENS", 32.0))
+        cam.location = V(float(os.environ.get("HERO_CX", 18)), float(os.environ.get("HERO_CY", -235)), float(os.environ.get("HERO_CZ", -10)))
+        aim = V(18, 0, 14)
+    elif SHOT == "deploy":
+        cam.data.lens = float(os.environ.get("HERO_LENS", 30.0))
+        dz = space.sb + 24.5 - space.ship_c.z
+        cam.location = V(dz - 46, -66, 16)
+        aim = V(dz - 4, -14, -3)
+    else:  # onboard: on the ship's aft skirt, looking back down the stack
+        cam.data.lens = float(os.environ.get("HERO_LENS", 18.0))
+        cam.parent = space.ship
+        cam.matrix_parent_inverse = Matrix.Translation(-space.ship_c)
+        cam.location = V(R + 3.2, 1.6, space.sb - 0.6)
+        q = (V(-R * 0.4, 0, space.sb - 70.0) - cam.location).to_track_quat("-Z", "Y")
+        cam.rotation_euler = q.to_euler()
+        return
+    cam.rotation_euler = (aim - cam.location).to_track_quat("-Z", "Y").to_euler()
+
+
+def main_space():
+    t0 = time.time()
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    scene = bpy.context.scene
+    M = {
+        "booster": mat_steel("steel_booster", [], soot_to=PAD_H + 22.0),
+        "ship": mat_steel("steel_ship", [], ring_from=PAD_H + BOOSTER_H),
+        "tiles": mat_tiles(),
+        "tiles_flat": mat_paint("tiles_flat", (0.016, 0.016, 0.018), rough=0.5, grime=0.2),
+        "dark": mat_paint("dark_steel", (0.05, 0.052, 0.056), rough=0.5, metal=0.8, grime=0.4),
+        "engine": mat_paint("engine", (0.07, 0.06, 0.055), rough=0.45, metal=0.9, grime=0.8),
+        "engine_glow": mat_plain("engine_glow", (0.75, 0.8, 1.0), emit=float(os.environ.get("HERO_GLOW", 900.0))),
+        "flame": mat_flame(density=float(os.environ.get("HERO_PLUME_DENSITY", 0.12))),
+        "flare": mat_flare(),
+        "slot": mat_plain("slot", (0.004, 0.004, 0.005), rough=0.9),
+        "solar": mat_solar(),
+        "foil": mat_foil(),
+    }
+    build_stack(M)
+    stack_objs = list(scene.objects)
+    cam = setup_space(scene)
+    space = Space(scene, M, stack_objs)
+    place_space_camera(cam, space)
+    log("space scene built", SHOT, round(time.time() - t0, 1))
+    scene.render.image_settings.file_format = "PNG"
+    scene.render.image_settings.color_mode = "RGBA"
+    if os.environ.get("HERO_SEQ"):
+        a, b, n = os.environ["HERO_SEQ"].split(",")
+        a, b, n = float(a), float(b), int(n)
+        start = int(os.environ.get("HERO_SEQ_START", 0))
+        frames = [(start + i, a + (b - a) * i / (n - 1)) for i in range(n)]
+    else:
+        frames = [(None, float(os.environ.get("HERO_T", 0.0)))]
+    for i, t in frames:
+        path = os.path.join(OUT, NAME + ".png") if i is None else os.path.join(OUT, "%s_%03d.png" % (NAME, i))
+        if i is not None and os.path.exists(path):
+            continue
+        v = space.set(t)
+        if os.environ.get("HERO_DEBUG"):
+            bpy.context.view_layer.update()
+            for o in scene.objects:
+                if o.type == "MESH":
+                    c = o.matrix_world @ (sum((Vector(b) for b in o.bound_box), Vector()) / 8)
+                    log("obj", o.name, "parent", o.parent.name if o.parent else "-", "centre", tuple(round(x, 1) for x in c), "hidden", o.hide_render)
+        scene.render.filepath = path
+        bpy.ops.render.render(write_still=True)
+        log("frame", i, "t=%.2f" % t, "v=%.1f" % v, "at", round(time.time() - t0, 1), "s")
+    log("rendered", scene.render.resolution_x, "x", scene.render.resolution_y, "in", round(time.time() - t0, 1), "s")
+
 LIFTOFF = bool(os.environ.get("HERO_T") or os.environ.get("HERO_SEQ"))
 SHOT = os.environ.get("HERO_SHOT", "wide")
 
@@ -986,7 +1360,7 @@ def main():
     scene = bpy.context.scene
     M = {
         "booster": mat_steel("steel_booster", [(PAD_H + 5.0, PAD_H + 27.0), (PAD_H + 29.5, PAD_H + 62.5)], soot_to=PAD_H + 4.5),
-        "ship": mat_steel("steel_ship", [(PAD_H + BOOSTER_H + 3.5, PAD_H + BOOSTER_H + 15.0), (PAD_H + BOOSTER_H + 17.0, PAD_H + BOOSTER_H + 29.0)]),
+        "ship": mat_steel("steel_ship", ring_from=PAD_H + BOOSTER_H, frost_bands=[(PAD_H + BOOSTER_H + 3.5, PAD_H + BOOSTER_H + 15.0), (PAD_H + BOOSTER_H + 17.0, PAD_H + BOOSTER_H + 29.0)]),
         "tiles": mat_tiles(),
         "tiles_flat": mat_paint("tiles_flat", (0.016, 0.016, 0.018), rough=0.5, grime=0.2),
         "dark": mat_paint("dark_steel", (0.05, 0.052, 0.056), rough=0.5, metal=0.8, grime=0.4),
@@ -1003,6 +1377,7 @@ def main():
         "vapour": mat_vapour(float(os.environ.get("HERO_VAPOUR", 0.05))),
         "steam": mat_vapour(float(os.environ.get("HERO_STEAM", 0.55)), scale=3.4, cut=0.5, name="steam"),
         "flame": mat_flame(),
+        "slot": mat_plain("slot", (0.004, 0.004, 0.005), rough=0.9),
         "engine": mat_paint("engine", (0.07, 0.06, 0.055), rough=0.45, metal=0.9, grime=0.8),
         "engine_glow": mat_plain("engine_glow", (0.75, 0.8, 1.0), emit=float(os.environ.get("HERO_GLOW", 2500.0))),
         "scrub": mat_paint("scrub", (0.03, 0.04, 0.018), rough=0.95, grime=0.3),
@@ -1050,7 +1425,7 @@ def main():
 
 
 try:
-    main()
+    main_space() if SCENE == "space" else main()
     open(DONE, "w").write("ok")
 except Exception:
     log(traceback.format_exc())

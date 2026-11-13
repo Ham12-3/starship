@@ -382,3 +382,64 @@ html[data-clean] .plate-grade {
 .copy.passing.right h2 {
   font-size: clamp(1.3rem, 2.6vw, 2.4rem);
 }
+
+/* ---- Photo chapters (NASA images) ---- */
+.plate.photos,
+.plate.seq {
+  background: transparent;
+  pointer-events: none;
+}
+
+.plate.photos {
+  background: #000;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  --zoom: 1;
+}
+
+.photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: calc(var(--focus, 0.5) * 100%) 50%;
+  transform: scale(var(--zoom));
+  transform-origin: calc(var(--focus, 0.5) * 100%) 50%;
+  will-change: transform;
+}
+
+/* Planets float whole on black, on the right, clear of the captions */
+.photo.contain img {
+  object-fit: contain;
+  width: 62%;
+  left: auto;
+  right: 3%;
+  object-position: 50% 50%;
+}
+
+.photo figcaption {
+  position: absolute;
+  left: clamp(20px, 6vw, 96px);
+  bottom: 18px;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: rgb(242 239 233 / 0.6);
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .photo.contain img {
+    width: 100%;
+    right: 0;
+  }
+}
+
+.legal p {
+  margin: 0 0 0.6em;
+  max-width: 60rem;
+}

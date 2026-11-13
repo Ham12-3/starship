@@ -2,6 +2,22 @@
 
 Newest first. Each entry: what was chosen and why.
 
+## After liftoff: renders over real NASA photos (13 Nov 2026)
+
+**What.** Hot staging (chase camera), the onboard view back at the falling booster, and the Starlink deploy are
+Blender sequences rendered with a transparent background and drawn over real NASA photographs of Earth from the space
+station. "To orbit" and the new "Out there" chapter are NASA photographs only: the Milky Way over Earth, Jupiter and
+Saturn from Cassini, and Webb's Carina Nebula.
+
+**Why.** Real photographs carry the realism in space; a render of Earth, a galaxy or a planet would look worse and
+cost far more. The rocket is the only made-up thing in those frames.
+
+**Sources.** NASA's image library, which allows educational use with credit. SpaceX's own photos are copyrighted and
+are not used. Flickr was not reachable from the in-app browser.
+
+**Story change.** A new chapter, "Out there", sits between orbit and payload. The booster-catch chapter currently shows
+the onboard view of the booster falling away; the catch itself is not rendered yet.
+
 ## Hero moved to a path-traced plate (13 Nov 2026)
 
 **Why.** The owner judged the live hero shot fake, and the reference frames showed why: too few parts, no bounce
