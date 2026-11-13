@@ -29,6 +29,8 @@ export default function Experience() {
   const [tier, setTier] = useState<TierName | null>(null);
   const [backend, setBackend] = useState<Backend | null>(null);
   const pinned = useRef(false);
+  const [ready, setReady] = useState(false);
+  const onReady = useCallback(() => setReady(true), []);
 
   useEffect(() => {
     const override = tierOverride();
@@ -46,15 +48,15 @@ export default function Experience() {
   if (!tier) return null;
 
   return (
-    <div className="stage" aria-hidden="true">
+    <div className="stage" aria-hidden="true" data-ready={ready}>
       <Canvas
         flat
         // R3F accepts an async renderer factory; its types still describe WebGLRenderer.
         gl={((props: { canvas: HTMLCanvasElement }) => createRenderer(props.canvas, setBackend)) as never}
-        camera={{ fov: 10, near: 0.5, far: 60000, position: [0, 1.6, 1400] }}
+        camera={{ fov: 3, near: 5, far: 80000, position: [0, 3, 4000] }}
         dpr={1}
       >
-        <Scene tier={tier} onBenchmark={onBenchmark} />
+        <Scene tier={tier} onBenchmark={onBenchmark} onReady={onReady} />
       </Canvas>
       {process.env.NODE_ENV === "development" && (
         <div className="debug">

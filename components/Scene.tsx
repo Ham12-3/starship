@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three/webgpu";
-import rockets from "@/data/rockets.json";
+import GoldenShot from "./hero/GoldenShot";
+import Post from "./Post";
 import { story } from "@/lib/chapters";
 import { getCameraObject, seek } from "@/lib/timeline";
 import { TIERS, type TierName } from "@/lib/quality";
@@ -22,16 +23,23 @@ function CameraRig() {
 
   useEffect(() => {
     camera.filmGauge = FULL_FRAME_WIDTH_MM;
-    camera.near = 0.5;
-    camera.far = 60000;
+    camera.near = 5;
+    camera.far = 80000;
   }, [camera]);
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     seek(story.progress);
     const v = obj.value;
     const b = v.bearing * DEG;
     camera.position.set(Math.sin(b) * v.distance, v.height, Math.cos(b) * v.distance);
-    camera.lookAt(0, v.lookHeight, 0);
+    // A tracking mount is never perfectly still: slow drift plus a faint
+    // tremor, sized in angle so it reads the same on any lens.
+    const t = clock.elapsedTime;
+    const wander = v.distance * 0.00009;
+    const dx = (Math.sin(t * 0.21) + 0.6 * Math.sin(t * 0.53 + 1.3) + 0.12 * Math.sin(t * 7.1)) * wander;
+    const dy = (Math.sin(t * 0.17 + 2.1) + 0.5 * Math.sin(t * 0.61) + 0.12 * Math.sin(t * 8.3 + 0.4)) * wander;
+    const px = dx + v.pan; // pan: metres left or right of the pad, at the pad
+    camera.lookAt(px * Math.cos(b), v.lookHeight + dy, -px * Math.sin(b));
     if (camera.getFocalLength() !== v.focalLength) camera.setFocalLength(v.focalLength);
   }, -1);
 
@@ -86,48 +94,13 @@ function Governor({ tier, onBenchmark }: { tier: TierName; onBenchmark: (ms: num
   return null;
 }
 
-/**
- * Phase 0 stand-ins only: a plain cylinder at the real stack size and a
- * person-height post beside it, so camera moves and scale can be judged.
- * Replaced by the hero model in Phase 1/2.
- */
-function Placeholders() {
-  const h = rockets.hero.stackHeight.value;
-  const d = rockets.hero.diameter.value;
-  const boosterH = rockets.hero.boosterHeight.value;
-  const person = rockets.scaleReferences.find((r) => r.id === "person")!.height.value;
+export default function Scene({ tier, onBenchmark, onReady }: { tier: TierName; onBenchmark: (ms: number[]) => void; onReady: () => void }) {
   return (
     <>
-      <mesh position={[0, boosterH / 2, 0]}>
-        <cylinderGeometry args={[d / 2, d / 2, boosterH, 64]} />
-        <meshStandardMaterial color="#8a8d90" metalness={0.9} roughness={0.45} />
-      </mesh>
-      <mesh position={[0, boosterH + (h - boosterH) / 2, 0]}>
-        <cylinderGeometry args={[d / 2, d / 2, h - boosterH, 64]} />
-        <meshStandardMaterial color="#6f7276" metalness={0.9} roughness={0.5} />
-      </mesh>
-      <mesh position={[12, person / 2, 0]}>
-        <boxGeometry args={[0.5, person, 0.3]} />
-        <meshStandardMaterial color="#d9772b" roughness={0.8} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[30000, 64]} />
-        <meshStandardMaterial color="#3a3835" roughness={1} />
-      </mesh>
-    </>
-  );
-}
-
-export default function Scene({ tier, onBenchmark }: { tier: TierName; onBenchmark: (ms: number[]) => void }) {
-  return (
-    <>
-      <color attach="background" args={["#1b2230"]} />
-      <fog attach="fog" args={["#1b2230", 800, 9000]} />
-      <hemisphereLight args={["#5d7190", "#2a2622", 0.9]} />
-      <directionalLight position={[-800, 120, 300]} intensity={2.4} color="#ffb27a" />
       <CameraRig />
       <Governor tier={tier} onBenchmark={onBenchmark} />
-      <Placeholders />
+      <GoldenShot onReady={onReady} />
+      <Post tier={tier} />
     </>
   );
 }

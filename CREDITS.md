@@ -14,7 +14,11 @@ Every third-party asset, sound and library is logged here before it ships.
 
 ## 3D models, textures, HDRIs
 
-None yet.
+| Asset | Author | Licence | Source |
+|---|---|---|---|
+| Industrial Sunset (Pure Sky) HDRI, 1k | Poly Haven | CC0 | https://polyhaven.com/a/industrial_sunset_puresky |
+
+All rocket, tower and pad geometry is generated in code for this project.
 
 ## Audio
 

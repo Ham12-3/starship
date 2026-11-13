@@ -2,6 +2,37 @@
 
 Newest first. Each entry: what was chosen and why.
 
+## Phase 1, first look-dev pass (13 Nov 2026)
+
+**Route: real-time first (Tier B).** Blender is not installed and there are no reference frames yet, so the hero shot
+starts as a real-time scene. If it cannot pass the 5-person test it becomes a path-traced loop (Tier A) using the same
+camera and grade.
+
+**The shot.** Long lens, 400 mm pushing to 520 mm on scroll, 4 km from the pad, camera 3 m above the ground, blue hour.
+At that distance the rocket is about 0.2 m per pixel, so the look depends on light, haze and lens behaviour far more
+than on model detail.
+
+**Sky.** Poly Haven "Industrial Sunset (Pure Sky)" at 1k (1.1 MB, CC0) for both lighting and backdrop. A long lens only
+sees a few degrees of sky, so a soft gradient is correct and the small file is enough. Rotated so the afterglow is off
+to one side: blue sky behind the stack, warm rim light on the tanks.
+
+**Models are procedural stand-ins** (`components/hero/builders.ts`), sized from `rockets.json`: welded steel rings,
+frost on the loaded tanks, heat tint above the engines, hot-staging ring, three grid fins, heat-shield half, flaps,
+lattice tower with catch arms, launch mount, tank farm, light masts, trucks. Phase 2 replaces them.
+Unverified guesses: grid fins 90 degrees apart with none on the tower side; launch mount height 12 m; tower 146 m.
+
+**Post stack** (`components/Post.tsx`, TSL, same code on WebGPU and WebGL2): heat shimmer, lateral chromatic
+aberration, bloom from bright sources only, vignette, AgX tonemap, grade (lower saturation, warm highlights, cool
+shadows, lifted blacks), luminance grain refreshed 24 times a second. Not yet in: depth of field, motion blur, AO,
+LUT file, 24 fps cadence.
+
+**Camera.** Added `pan` to the Theatre camera so the stack sits right of the headline and re-centres on the push-in.
+The mount drifts and trembles slightly, scaled by angle so it reads the same on any lens.
+
+**Headline changed at the owner's request:** "Taller than the Statue of Liberty" (93 m with pedestal) replaces the
+Big Ben line, with feet first and metres second. The comparison chapter should follow suit in Phase 3 (US references
+such as a school bus instead of a London bus): to confirm with the owner.
+
 ## Phase 0 (13 Nov 2026)
 
 **Stack versions.** Next.js 16 (App Router, `output: "export"`), React 19, three.js r187, React Three Fiber 9,

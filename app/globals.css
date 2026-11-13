@@ -26,6 +26,15 @@ body {
   z-index: 0;
 }
 
+.stage {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.stage[data-ready="true"] {
+  opacity: 1;
+}
+
 .stage canvas {
   display: block;
 }
