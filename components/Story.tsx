@@ -73,7 +73,8 @@ export default function Story() {
         while (k < tops.length - 1 && y >= tops[k + 1]) k++;
         const next = k < tops.length - 1 ? tops[k + 1] : tops[k] + 1;
         story.chapter = k + Math.min(Math.max((y - tops[k]) / Math.max(next - tops[k], 1), 0), 1);
-        const i = Math.round(story.chapter);
+        // Past the top of the last chapter the fraction reaches 1, so clamp to the last index
+        const i = Math.min(Math.round(story.chapter), CHAPTERS.length - 1);
         if (i !== activeRef.current) {
           activeRef.current = i;
           setActive(i);
@@ -127,6 +128,19 @@ export default function Story() {
                 <p className="lede">
                   {Math.round(Math.round(height) * 3.28084)} feet ({Math.round(height)} metres) of steel, built to fly to orbit and come back.
                 </p>
+                <a
+                  className="film-link"
+                  href="#film"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const el = document.getElementById("film");
+                    if (!el) return;
+                    if (lenisRef.current) lenisRef.current.scrollTo(el, { force: true });
+                    else el.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  ▶ Watch the 56-second film
+                </a>
                 <p className="cue">Scroll to begin</p>
               </div>
             ) : (

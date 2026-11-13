@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import Film from "@/components/Film";
 import HeroPlate from "@/components/HeroPlate";
 import PhotoChapter from "@/components/PhotoChapter";
 import SequencePlate from "@/components/SequencePlate";
@@ -51,13 +52,15 @@ export default function Page() {
         </>
       )}
       <Story />
+      <Film />
       <footer className="legal">
         <p>
           Independent educational fan project. Not affiliated with or endorsed by SpaceX, NASA, Blue Origin, ESA, CASC
           or any agency or company shown.
         </p>
         <p>
-          Rocket scenes are 3D renders made for this site. Photographs of Earth, planets and space: NASA (ISS crews;
+          Rocket scenes in the scroll story are 3D renders made for this site. The short film is an AI-generated
+          illustration made with Google Flow. Photographs of Earth, planets and space: NASA (ISS crews;
           JPL/Space Science Institute) and NASA, ESA, CSA, STScI (Webb).
         </p>
       </footer>

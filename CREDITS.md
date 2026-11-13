@@ -23,7 +23,13 @@ The hero plate is rendered with Blender (GPL; the licence does not apply to imag
 
 ## Audio
 
-None yet.
+The short film's narration and sound are generated with the film itself (see below). No other audio.
+
+## Generated film
+
+| File | What | Made with | Notes |
+|---|---|---|---|
+| `public/film/factory-to-orbit.mp4`, `poster.webp` | 56-second narrated film, seven 8-second clips | Google Flow, Omni 1.2 Flash, 720p | Text prompts only, no input images. Labelled on the page as an AI-generated illustration. Prompts are in `docs/flow-plates.md`. |
 
 ## Imagery
 

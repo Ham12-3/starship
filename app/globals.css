@@ -443,3 +443,70 @@ html[data-clean] .plate-grade {
   margin: 0 0 0.6em;
   max-width: 60rem;
 }
+
+/* ---- The short film: a normal section after the scroll story ---- */
+.film {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  padding: clamp(64px, 12vh, 140px) clamp(20px, 6vw, 96px);
+}
+
+.film-copy {
+  max-width: 40rem;
+  margin-bottom: clamp(24px, 4vh, 48px);
+}
+
+.film-frame {
+  margin: 0 auto;
+  max-width: 1280px;
+}
+
+.film-frame video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.film-frame figcaption {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+}
+
+/* Link from the hero down to the film */
+.film-link {
+  display: inline-block;
+  margin-top: 1.6em;
+  font-size: 0.95rem;
+  color: var(--ink);
+  text-decoration: none;
+  text-shadow: none;
+  background: rgb(0 0 0 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 999px;
+  padding: 10px 18px;
+}
+
+.film-link:hover {
+  border-color: var(--accent);
+}
+
+.film-link + .cue {
+  margin-top: 2em;
+}
+
+/* Keep the player clear of the chapter dots on narrow screens */
+@media (max-width: 900px) {
+  .film {
+    padding-right: 44px;
+  }
+}
+
+html[data-clean] .film {
+  visibility: hidden;
+}

@@ -1,7 +1,7 @@
 # Generated plates (Google Flow)
 
 Flow clips are a stand-in for the path-traced Tier A plates until Blender is set up. They cannot be re-rendered from a
-script, so every attempt is logged here: input, settings, prompt, verdict. Nothing from this log is on the site yet.
+script, so every attempt is logged here: input, settings, prompt, verdict. The three plate attempts below are not on the site. The short film at the end of this file is.
 
 Rules:
 
@@ -64,3 +64,18 @@ So Flow is not a shortcut around a better model. Where it can still help:
 - Vapour, steam and smoke elements to layer over the live scene, generated on plain backgrounds.
 - Later, starting from a much better frame (the Phase 2 Blender model, path-traced), where there is less for the model
   to fix.
+
+## The short film (13 Nov 2026): on the site
+
+Not a plate. A separate, clearly labelled film in its own section (`components/Film.tsx`, `/#film`), linked from the
+hero. The scroll story still uses our own renders only.
+
+- Flow project: "Nov 13 - 17:04". Scene: "Untitled Scene 11-13 17:07:39".
+- Model: Omni 1.2 Flash, 720p, 8 s, 16:9, 1 output each, text only. Seven clips, 168 credits.
+- Every prompt ends: "Photoreal, cinematic, anamorphic lens, natural film grain, no on-screen text, no subtitles. A
+  calm, deep documentary narrator says in voice-over: "..."". The seven shot descriptions and narration lines are in
+  `higgsfield/shots.md` (written for Higgsfield first; that account had no credits, so Flow was used).
+- Export: 1280 x 720, 24 fps, 50.7 MB. Re-encoded for the site with ffmpeg (H.264, CRF 26, faststart) to 8 MB.
+- Checked: one frame from each shot matches its brief. Not checked: the narration audio, and motion between frames.
+- Known gaps against the brief: the rocket's shape differs from shot to shot and is not our model; the engine shot
+  does not show 33 engines; planets are shown in a line, which is not how they sit in the sky.
