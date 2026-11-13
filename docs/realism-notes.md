@@ -93,3 +93,39 @@ Still giving it away:
 
 Measured in the dev pane (800 x 521) on the WebGL2 path with reflection on: about 16.6 ms a frame. Full-screen and
 phone are still unmeasured.
+
+## Owner's reference frames (received 13 Nov 2026)
+
+Saved in `/reference/` (git-ignored, private study only). Owner's verdict on the live hero shot: "not realistic, looks
+fake, looks like something that can be easily created." That verdict is right. Why, frame by frame:
+
+- **01 tower and ship (a studio-style render).** This is CG too, and it still reads as real. The difference from ours
+  is part count and light. The tower has hundreds of distinct parts: box-section columns, gusset plates at every
+  joint, stair flights, handrails, a clad head house, a hook block on cables. The catch arm is a deep welded truss.
+  The ship shows individual tile rows. Light is soft and wraps, with contact shadow in every joint. Ours has perhaps a
+  twentieth of the parts and no bounce light or occlusion at all.
+- **02 and 09 booster catch at dusk (footage).** The subject fills the frame. The camera is a few hundred metres away
+  on a drone, not four kilometres away on a telescope. There is a real sea with swell and a soft horizon, real cloud
+  flecks, soot streaks and scorch on the booster, a ragged flame with smoke. Nothing is clean.
+- **04 engines.** Every bell is different: numbered, discoloured, ribbed, with pipes and wiring. Colour comes from the
+  light (magenta and blue glow), not from the paint.
+- **03 and 08 orbit.** A thin, bright, blue atmosphere line; sun glare that blows out; cloud decks with real depth;
+  hard black shadow side.
+- **11 hangar.** Note: this is a Falcon 9 (nine Merlin engines), not Starship. Useful only for factory light: rows of
+  high-bay lamps, glossy floor, people and ladders for scale.
+
+Three things make ours look easy to make:
+
+1. **Too few parts.** Shapes built from boxes read as boxes at any distance.
+2. **No bounce light.** Real-time direct light with no occlusion makes everything look pasted on.
+3. **The subject is small.** A tiny silhouette on a smooth sky looks like a diagram. Every reference fills the frame.
+
+What this means for the plan:
+
+- The hero has to start from a properly modelled stack and tower, lit by a path tracer. That is Phase 2 pulled forward.
+- This PC has an Intel Iris Xe (integrated) GPU and an i5-1135G7. It can path-trace stills on the CPU in tens of
+  minutes each. It cannot render fluid simulations or long sequences in reasonable time. Sequences need a rented or
+  cloud GPU.
+- The same GPU is also what the live site was tuned on, so real-time ambitions should stay modest: the live layer adds
+  motion (vapour, lights, birds, grain, camera drift) over a path-traced plate rather than drawing the whole picture.
+- Move the hero camera in. A drone a few hundred metres out, stack and tower filling the frame, as in frames 01 and 02.
