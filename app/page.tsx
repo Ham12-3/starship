@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import HeroPlate from "@/components/HeroPlate";
+import LiftoffPlate from "@/components/LiftoffPlate";
 import Story from "@/components/Story";
 
 // The live 3D stage is kept for the interactive chapters still to come. It is
@@ -18,7 +19,14 @@ export default function Page() {
   }, []);
   return (
     <main>
-      {live ? <Experience /> : <HeroPlate />}
+      {live ? (
+        <Experience />
+      ) : (
+        <>
+          <HeroPlate />
+          <LiftoffPlate />
+        </>
+      )}
       <Story />
       <footer className="legal">
         Independent educational fan project. Not affiliated with or endorsed by SpaceX, NASA, Blue Origin, ESA, CASC or

@@ -324,3 +324,15 @@ html[data-clean] nextjs-portal {
 html[data-clean] .plate-grade {
   background: none;
 }
+
+/* Liftoff sequence sits above the hero plate and fades in for its chapters */
+.plate.liftoff {
+  z-index: 0;
+  pointer-events: none;
+}
+
+.plate-frame canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

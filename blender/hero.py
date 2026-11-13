@@ -5,6 +5,9 @@
 #
 # Environment variables: HERO_W, HERO_H (pixels), HERO_SPP (samples),
 # HERO_NAME (output file stem). Output goes to blender/out/.
+#
+# Liftoff: HERO_T=<seconds after ignition> renders one frame of the launch.
+# HERO_SEQ="t0,t1,count" renders a numbered sequence in one session.
 import bpy, bmesh, json, math, os, random, sys, time, traceback
 from mathutils import Matrix, Vector
 
@@ -289,9 +292,9 @@ def mat_sea():
     return m
 
 
-def mat_vapour(density):
+def mat_vapour(density, scale=2.6, cut=0.42, name="vapour"):
     """Cold venting gas: a soft-edged, wispy volume."""
-    m = bpy.data.materials.new("vapour")
+    m = bpy.data.materials.new(name)
     try:
         m.use_nodes = True
     except Exception:
@@ -309,9 +312,40 @@ def mat_vapour(density):
     L(nt, co.outputs["Object"], ln.inputs[0])
     fall = math_node(nt, "SUBTRACT", 1.0, ln.outputs["Value"], clamp=True)
     fall = math_node(nt, "POWER", fall, 1.4)
-    wisps = math_node(nt, "SUBTRACT", noise(nt, 2.6, 7.0, 0.62, stretch=(1.0, 1.6, 1.3)), 0.42, clamp=True)
+    wisps = math_node(nt, "SUBTRACT", noise(nt, scale, 7.0, 0.62, stretch=(1.0, 1.6, 1.3)), cut, clamp=True)
     dens = math_node(nt, "MULTIPLY", math_node(nt, "MULTIPLY", wisps, fall), density * 7.0)
     L(nt, dens, vol.inputs["Density"])
+    L(nt, vol.outputs["Volume"], out.inputs["Volume"])
+    return m
+
+
+def mat_flame():
+    """Methalox plume: blue-white and very bright at the nozzles, fading to thin orange."""
+    m = bpy.data.materials.new("flame")
+    try:
+        m.use_nodes = True
+    except Exception:
+        pass
+    nt = m.node_tree
+    for n in list(nt.nodes):
+        if n.type != "OUTPUT_MATERIAL":
+            nt.nodes.remove(n)
+    out = next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL")
+    vol = N(nt, "ShaderNodeVolumePrincipled")
+    co = N(nt, "ShaderNodeTexCoord")
+    sp = N(nt, "ShaderNodeSeparateXYZ")
+    L(nt, co.outputs["Object"], sp.inputs[0])
+    # object space: z runs +0.5 at the engines to -0.5 at the tail, radius 1 at the edge
+    along = math_node(nt, "ADD", sp.outputs["Z"], 0.5, clamp=True)
+    rad = math_node(nt, "SQRT", math_node(nt, "ADD", math_node(nt, "POWER", sp.outputs["X"], 2.0), math_node(nt, "POWER", sp.outputs["Y"], 2.0)))
+    core = math_node(nt, "POWER", math_node(nt, "SUBTRACT", 1.0, rad, clamp=True), 1.6)
+    flick = math_node(nt, "ADD", math_node(nt, "MULTIPLY", noise(nt, 3.0, 4.0, 0.6, stretch=(1.0, 1.0, 0.25)), 0.9), 0.55)
+    power = math_node(nt, "MULTIPLY", math_node(nt, "MULTIPLY", core, math_node(nt, "POWER", along, 2.2)), flick)
+    col = mix_rgb(nt, along, (1.0, 0.42, 0.12), (0.72, 0.8, 1.0))
+    L(nt, col, vol.inputs["Emission Color"])
+    L(nt, math_node(nt, "MULTIPLY", power, float(os.environ.get("HERO_FLAME", 320.0))), vol.inputs["Emission Strength"])
+    L(nt, math_node(nt, "MULTIPLY", core, 0.012), vol.inputs["Density"])
+    vol.inputs["Color"].default_value = (1.0, 0.8, 0.6, 1)
     L(nt, vol.outputs["Volume"], out.inputs["Volume"])
     return m
 
@@ -725,7 +759,7 @@ def build_site(M):
     obj("heads", head, M["hat"])
 
     # vapour: off the booster and ship vents, and pooling round the mount; wind toward +X
-    for k, (c, sc) in enumerate((
+    for k, (c, sc) in enumerate(() if LIFTOFF else (
         (V(7, -1, PAD_H + 61), (13, 6, 4.5)),
         (V(5, 1, PAD_H + BOOSTER_H + 28), (9, 4.5, 3.2)),
         (V(12, -4, PAD_H + 1.5), (30, 20, 7.5)),
@@ -764,6 +798,69 @@ def build_site(M):
 
 MASTS = [(78, -92), (-72, -84), (104, 70), (-88, 64)]
 
+LIFTOFF = bool(os.environ.get("HERO_T") or os.environ.get("HERO_SEQ"))
+
+
+def smooth(x):
+    x = max(0.0, min(1.0, x))
+    return x * x * (3 - 2 * x)
+
+
+class Launch:
+    """Everything that changes with time after ignition."""
+
+    def __init__(self, scene, M, stack_objs):
+        self.scene = scene
+        self.stack = [(o, o.location.z) for o in stack_objs]
+        bm = bmesh.new()
+        bmesh.ops.create_cone(bm, cap_ends=True, segments=32, radius1=1.0, radius2=0.42, depth=1.0)
+        self.flame = obj("flame", bm, M["flame"])
+        ld = bpy.data.lights.new("plume", "POINT")
+        ld.color = (1.0, 0.7, 0.42)
+        ld.shadow_soft_size = 7.0
+        self.light = bpy.data.objects.new("plume", ld)
+        scene.collection.objects.link(self.light)
+        self.steam = []
+        r2 = random.Random(3)
+        for i in range(11):
+            b = bmesh.new()
+            bmesh.ops.create_uvsphere(b, u_segments=24, v_segments=12, radius=1.0)
+            o = obj("steam%d" % i, b, M["steam"])
+            a = 2 * math.pi * i / 10 + r2.uniform(-0.2, 0.2)
+            self.steam.append((o, a, r2.uniform(0.75, 1.25), r2.uniform(0, 6.28), i == 10))
+        self.cam = scene.camera
+        self.cam_target_z = float(os.environ.get("HERO_TZ", 84))
+
+    def set(self, t):
+        # About 1.5 g of thrust: slow off the pad, then quickly away
+        lift = 0.5 * 4.6 * max(t, 0.0) ** 2
+        for o, z0 in self.stack:
+            o.location.z = z0 + lift
+        burn = smooth((t + 1.2) / 1.2)  # engines come up over the last second before release
+        base = PAD_H + lift
+        length = 30 + 62 * burn
+        self.flame.scale = (R * (1.25 + 0.5 * burn), R * (1.25 + 0.5 * burn), length)
+        self.flame.location = (0, 0, base - length / 2 + 0.5)
+        self.flame.hide_render = burn <= 0.01
+        self.light.location = (0, 0, max(base - 22, 6))
+        self.light.data.energy = float(os.environ.get("HERO_PLUME", 2.2e8)) * burn
+        grow = smooth((t + 1.2) / 6.5)
+        for o, a, k, rot, centre in self.steam:
+            if centre:
+                o.location = (4, 0, 5 + 5 * grow)
+                o.scale = (24 + 26 * grow, 22 + 24 * grow, 7 + 8 * grow)
+            else:
+                rr = (16 + 68 * grow) * k
+                o.location = (math.cos(a) * rr * 1.25, math.sin(a) * rr, 4 + 8 * grow * k)
+                o.scale = ((14 + 36 * grow) * k, (13 + 32 * grow) * k, (5 + 12 * grow) * k)
+            o.rotation_euler = (0.2 * k, 0.1, rot + 0.25 * t)
+            o.hide_render = burn <= 0.01
+        # the camera stops down as the plume lights, and tilts up to follow
+        self.scene.view_settings.exposure = float(os.environ.get("HERO_EXPOSURE", 0.75)) - 2.0 * burn
+        target = V(float(os.environ.get("HERO_TX", -62)), 0, self.cam_target_z + lift * 0.8)
+        self.cam.rotation_euler = (target - self.cam.location).to_track_quat("-Z", "Y").to_euler()
+        return lift
+
 # -------------------------------------------------------------------- scene
 
 
@@ -778,7 +875,10 @@ def setup(scene):
     scene.cycles.adaptive_threshold = 0.03
     scene.cycles.use_denoising = True
     scene.cycles.max_bounces = 6
-    scene.cycles.volume_bounces = 1
+    # Volumes are the slow part on a CPU: single scattering and coarser steps for the launch frames
+    scene.cycles.volume_bounces = 0 if LIFTOFF else 1
+    scene.cycles.volume_step_rate = 4.0 if LIFTOFF else 1.0
+    scene.cycles.volume_max_steps = 128
     scene.cycles.sample_clamp_indirect = 8.0
     scene.render.resolution_x, scene.render.resolution_y = w, h
     scene.render.resolution_percentage = 100
@@ -866,12 +966,15 @@ def main():
         "lamp": mat_plain("lamp", (1.0, 0.93, 0.82), emit=float(os.environ.get("HERO_LAMP", 160.0))),
         "beacon": mat_plain("beacon", (1.0, 0.08, 0.04), emit=600.0),
         "vapour": mat_vapour(float(os.environ.get("HERO_VAPOUR", 0.05))),
+        "steam": mat_vapour(float(os.environ.get("HERO_STEAM", 0.55)), scale=3.4, cut=0.5, name="steam"),
+        "flame": mat_flame(),
         "scrub": mat_paint("scrub", (0.03, 0.04, 0.018), rough=0.95, grime=0.3),
         "road": mat_paint("road", (0.05, 0.05, 0.052), rough=0.8, grime=0.2),
         "ground": mat_ground(),
         "sea": mat_sea(),
     }
     build_stack(M)
+    stack_objs = list(scene.objects)
     log("stack built", round(time.time() - t0, 1))
     build_tower(M)
     log("tower built", round(time.time() - t0, 1))
@@ -883,8 +986,28 @@ def main():
     if os.environ.get("HERO_SAVE_BLEND"):
         bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, NAME + ".blend"))
     scene.render.image_settings.file_format = "PNG"
-    scene.render.filepath = os.path.join(OUT, NAME + ".png")
-    bpy.ops.render.render(write_still=True)
+    if LIFTOFF:
+        launch = Launch(scene, M, stack_objs)
+        if os.environ.get("HERO_SEQ"):
+            a, b, n = os.environ["HERO_SEQ"].split(",")
+            a, b, n = float(a), float(b), int(n)
+            frames = [(i, a + (b - a) * i / (n - 1)) for i in range(n)]
+        else:
+            frames = [(None, float(os.environ["HERO_T"]))]
+        for i, t in frames:
+            if i is not None:
+                path = os.path.join(OUT, "%s_%03d.png" % (NAME, i))
+                if os.path.exists(path):  # lets an interrupted sequence resume
+                    continue
+            else:
+                path = os.path.join(OUT, NAME + ".png")
+            lift = launch.set(t)
+            scene.render.filepath = path
+            bpy.ops.render.render(write_still=True)
+            log("frame", i, "t=%.2f" % t, "lift=%.1f" % lift, "at", round(time.time() - t0, 1), "s")
+    else:
+        scene.render.filepath = os.path.join(OUT, NAME + ".png")
+        bpy.ops.render.render(write_still=True)
     log("rendered", scene.render.resolution_x, "x", scene.render.resolution_y, "in", round(time.time() - t0, 1), "s")
 
 
