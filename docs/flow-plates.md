@@ -35,9 +35,32 @@ Rules:
   stack sitting on the pad, so it cannot loop and it reads as staged. The steel and tower were barely changed, so they
   still look rendered. 720p is soft for a full-screen hero.
 
-## What to change next
+## Clip 3: from our render, start and end frame the same (13 Nov 2026)
 
-- Ask for a steady state: "light, wispy venting, the same amount throughout", and drop "thick".
-- Start from a frame that already has the right amount of vapour, so the model continues it rather than inventing it.
-- Try a higher-quality model in the same menu for the steel and tower, and compare cost.
-- Supply an end frame equal to the start frame so the clip can loop.
+- Model: Omni 1.2 Flash, 720p, 8 s, 16:9, 1 output, 24 credits. Frames mode, same image as start and end.
+- Prompt: "A calm, steady, seamless loop of real telephoto documentary footage. The first and last frame are identical.
+  Keep the rocket, launch tower, catch arms, light masts, ground and sky exactly as in the frame: same shapes,
+  proportions and positions, nothing added, removed or redrawn. Locked-off 500mm lens from four kilometres away at blue
+  hour. Very little happens: only a few thin, faint wisps of cold vapour drift slowly to the right from the side of the
+  rocket and from its base, the same small amount from the first second to the last, never growing, never forming
+  clouds or billows. Soft atmospheric haze, very gentle heat shimmer near the ground, fine natural sensor grain, an
+  almost invisible slow camera drift. The red light on top of the tower blinks slowly. The rocket stays on the pad and
+  does not launch. No smoke clouds, no steam plumes, no flames, no people, no text, no logos. Photorealistic, natural
+  colour."
+- Verdict: **loops and behaves, but adds nothing.** Checked at 0:00 and 7:19 (the middle of the clip was not
+  inspected: the page stopped responding). The vapour stays small and the last frame matches the first, so it would
+  loop. But the picture is our render almost unchanged: same simple tower, same flat steel. It is no more convincing
+  than the live scene, at lower resolution.
+
+## What the three clips show
+
+The model trades accuracy against realism. Left free (clip 1) it makes footage that looks filmed but gets the rocket
+wrong. Pinned to our frame (clips 2 and 3) it keeps the rocket right and keeps the rendered look too. It will not
+turn a simple render into a photo while holding every shape.
+
+So Flow is not a shortcut around a better model. Where it can still help:
+
+- Shots where the rocket is small, far away or hidden: steam clouds, sky, crowd, sea, launch-day atmosphere.
+- Vapour, steam and smoke elements to layer over the live scene, generated on plain backgrounds.
+- Later, starting from a much better frame (the Phase 2 Blender model, path-traced), where there is less for the model
+  to fix.
