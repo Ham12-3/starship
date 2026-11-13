@@ -85,3 +85,23 @@ their components stay in the repo but are not rendered. This sets aside the "our
 - Known gaps: there is no footage of hot staging, the booster catch, re-entry or the ship catch, so that copy sits
   over other shots. The rocket's shape differs from shot to shot; the engine shot does not show 33 engines; planets
   are shown in a line.
+
+## The film, second version (13 Nov 2026): on the site
+
+Regenerated after the owner supplied a reference clip (one continuous camera climb, subject locked on the centre line,
+tiny palette, cloud as the ending). The first version was seven unrelated shots and was cut to 960 x 540 frames, which
+looked soft full-screen.
+
+- Model: Veo 3.1 Fast, 720p, 8 s, 16:9, two takes per prompt (20 credits a take, 240 in all). Veo 3.1 Quality costs
+  100 a take, which the balance could not cover with retries. The better take of each pair was chosen by eye at the
+  start, middle and end.
+- Every prompt fixes: the rocket on the exact vertical centre line; one continuous straight-up camera move; no people;
+  black, steel grey and one orange accent; empty space either side; "ultra sharp, highly detailed, photoreal".
+  Clips end in a white-out or blackout and the next begins in it, to hide the joins.
+- Six shots, 48 s: hangar, pad, engines from below, climb through cloud, space with the Milky Way and planets,
+  satellites drifting up the centre line. Scene "Untitled Scene 11-13 18:25:32" in project "Nov 13 - 17:04".
+- Frames: `fps=10,scale=1280:720`, WebP quality 72, 479 frames, 25 MB, in `public/plates/journey/`.
+- Chapter pins (`data/film-plate.json`): hangar (top to testing), pad (rollout, fuelling), engines (liftoff), climb
+  (staging, booster catch), space (orbit, beyond), satellites (payload).
+- Known gaps: the pad shot shows side boosters and flame at the base, unlike the hangar rocket; the space shot's ship
+  looks like a station and the planets are oversized; still no hot staging, booster catch, re-entry or ship catch.

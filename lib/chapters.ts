@@ -17,12 +17,62 @@ export interface Chapter {
 
 export const CHAPTERS: Chapter[] = [
   { id: "top", label: "Start", tier: "B" },
-  { id: "steel", label: "Steel", tier: "B+C" },
-  { id: "stacking", label: "Stacking", tier: "B" },
-  { id: "engines", label: "33 engines", tier: "B" },
-  { id: "testing", label: "Testing", tier: "A" },
-  { id: "rollout", label: "Rollout", tier: "B" },
-  { id: "fuelling", label: "Fuelling", tier: "B" },
+  {
+    id: "steel",
+    label: "Steel",
+    tier: "B+C",
+    beats: [
+      { side: "right", kicker: "The metal", text: "Not carbon fibre. Stainless steel, the same family as a kitchen sink." },
+      { side: "left", kicker: "Why steel", text: "It is cheap, it gets stronger in the cold, and it shrugs off heat." },
+      { side: "right", kicker: "Rings", text: "Flat sheets are rolled into rings and welded shut, one after another." },
+    ],
+  },
+  {
+    id: "stacking",
+    label: "Stacking",
+    tier: "B",
+    beats: [
+      { side: "left", kicker: "Ring on ring", text: "The rings are stacked and welded into tanks as tall as a tower block." },
+      { side: "right", kicker: "The nose", text: "Last comes the pointed nose, lowered into place by crane." },
+    ],
+  },
+  {
+    id: "engines",
+    label: "33 engines",
+    tier: "B",
+    beats: [
+      { side: "right", kicker: "Raptor", text: "Every engine burns methane and liquid oxygen." },
+      { side: "left", kicker: "Underneath", text: "They are packed into the base of the booster in three rings." },
+    ],
+  },
+  {
+    id: "testing",
+    label: "Testing",
+    tier: "A",
+    beats: [
+      { side: "left", kicker: "Cold test", text: "First the tanks are filled with freezing liquid nitrogen to prove they hold." },
+      { side: "right", kicker: "Static fire", text: "Then the engines are lit for a few seconds while the rocket is held down." },
+    ],
+  },
+  {
+    id: "rollout",
+    label: "Rollout",
+    tier: "B",
+    beats: [
+      { side: "right", kicker: "Standing up", text: "The rocket travels to the launch pad upright, at walking pace." },
+      { side: "left", kicker: "The tower", text: "Waiting for it is a steel tower with two giant arms to lift it into place." },
+    ],
+  },
+  {
+    id: "fuelling",
+    label: "Fuelling",
+    tier: "B",
+    beats: [
+      { side: "left", kicker: "Very cold fuel", text: "In under an hour the tanks fill with methane and liquid oxygen, colder than minus 160 degrees Celsius." },
+      { side: "right", kicker: "The white clouds", text: "Not smoke. Cold gas boiling off, and the air around it turning to mist." },
+      { side: "left", kicker: "Frost", text: "The steel gets so cold that ice forms on the outside." },
+    ],
+  },
   { id: "liftoff", label: "Liftoff", tier: "A" },
   {
     id: "staging",

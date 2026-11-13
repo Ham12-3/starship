@@ -26,8 +26,8 @@ export interface FilmManifest {
 }
 
 /** Frames kept either side of the playhead, and the wider range that is not thrown away yet. */
-const AHEAD = 36;
-const KEEP = 90;
+const AHEAD = 20;
+const KEEP = 32;
 
 export default function FilmScroll({ manifest }: { manifest: FilmManifest }) {
   const canvas = useRef<HTMLCanvasElement>(null);

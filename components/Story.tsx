@@ -9,6 +9,15 @@ import rockets from "@/data/rockets.json";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/** The handful of chapters offered in the top bar; the dots cover the rest. */
+const NAV = [
+  { id: "steel", label: "Build" },
+  { id: "rollout", label: "Rollout" },
+  { id: "liftoff", label: "Liftoff" },
+  { id: "orbit", label: "Orbit" },
+  { id: "payload", label: "Payload" },
+];
+
 /**
  * The scroll spine: one tall section per chapter. Scroll position becomes
  * story.progress (0..1), which drives the Theatre.js playhead in the scene.
@@ -84,6 +93,33 @@ export default function Story() {
       },
     });
 
+    // Captions are pinned low in the middle of the picture. Each one has a tall
+    // invisible slot in the page; it is shown while its slot crosses the screen.
+    const slots = Array.from(root.current!.querySelectorAll<HTMLElement>(".cap"));
+    let capRaf = 0;
+    const caps = () => {
+      const vh = window.innerHeight;
+      for (const slot of slots) {
+        const r = slot.getBoundingClientRect();
+        const inner = slot.firstElementChild as HTMLElement;
+        if (r.bottom < -vh || r.top > 2 * vh) {
+          if (inner.style.opacity !== "0") {
+            inner.style.opacity = "0";
+            inner.style.visibility = "hidden";
+          }
+          continue;
+        }
+        // d runs from -0.5 to 0.5 as the slot's middle passes the middle of the screen
+        const d = (r.top + r.height / 2 - vh / 2) / r.height;
+        const o = Math.min(Math.max((0.5 - Math.abs(d)) / 0.14, 0), 1);
+        inner.style.opacity = o.toFixed(3);
+        inner.style.visibility = o > 0 ? "visible" : "hidden";
+        if (!reduced) inner.style.setProperty("--rise", (d * 28).toFixed(1) + "px");
+      }
+      capRaf = requestAnimationFrame(caps);
+    };
+    capRaf = requestAnimationFrame(caps);
+
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLElement && ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
       if (e.key === "ArrowDown" || e.key === "ArrowRight" || e.key === "PageDown") {
@@ -97,6 +133,7 @@ export default function Story() {
     window.addEventListener("keydown", onKey);
 
     return () => {
+      cancelAnimationFrame(capRaf);
       window.removeEventListener("keydown", onKey);
       window.clearTimeout(settle);
       trigger.kill();
@@ -117,29 +154,63 @@ export default function Story() {
     { side: "right", kicker: "Weight", text: `About ${hero.liftoffMass.value.toLocaleString("en-US")} tonnes, rising on a column of fire.` },
   ];
 
+  const launchIndex = CHAPTERS.findIndex((c) => c.id === LAUNCH_CHAPTER);
+  const jump = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    goTo(CHAPTERS.findIndex((c) => c.id === id));
+  };
+
   return (
     <>
+      <header className="bar">
+        <a className="brand" href="#top" onClick={jump("top")}>
+          <span className="brand-mark" aria-hidden="true" />
+          Factory to Orbit
+        </a>
+        <nav className="bar-nav" aria-label="Sections">
+          {NAV.map((n) => (
+            <a key={n.id} href={"#" + n.id} onClick={jump(n.id)}>
+              {n.label}
+            </a>
+          ))}
+        </nav>
+        <div className="bar-actions">
+          <a className="pill ghost" href="#credits" onClick={jump("credits")}>
+            Credits
+          </a>
+          <a className="pill solid" href={"#" + LAUNCH_CHAPTER} onClick={jump(LAUNCH_CHAPTER)}>
+            {active < launchIndex ? "Skip to launch" : "Watch the launch"}
+          </a>
+        </div>
+      </header>
+
       <div ref={root} className="story">
         {CHAPTERS.map((c, i) => (
           <section key={c.id} id={c.id} className="chapter" aria-label={c.label}>
             {i === 0 ? (
-              <div className="copy">
-                <h1>Taller than the Statue of Liberty.</h1>
-                <p className="lede">
-                  {Math.round(Math.round(height) * 3.28084)} feet ({Math.round(height)} metres) of steel, built to fly to orbit and come back.
-                </p>
-                <p className="cue">Scroll to begin</p>
+              <div className="cap">
+                <div className="cap-inner">
+                  <p className="badge">Scroll to begin</p>
+                  <h1>Taller than the Statue of Liberty.</h1>
+                  <p className="sub">
+                    {Math.round(Math.round(height) * 3.28084)} feet ({Math.round(height)} metres) of steel, built to fly to orbit and come back.
+                  </p>
+                </div>
               </div>
             ) : (
               <>
-                <div className={`copy passing ${i % 2 ? "left" : "right"}`}>
-                  <p className="eyebrow">Chapter {i}</p>
-                  <h2>{c.label}</h2>
+                <div className="cap">
+                  <div className="cap-inner">
+                    <p className="badge">Chapter {i}</p>
+                    <h2>{c.label}</h2>
+                  </div>
                 </div>
                 {(c.id === "liftoff" ? liftoffBeats : (c.beats ?? [])).map((b, k) => (
-                  <div key={k} className={`copy passing beat ${b.side}`}>
-                    {b.kicker && <p className="eyebrow">{b.kicker}</p>}
-                    <p className="lede">{b.text}</p>
+                  <div key={k} className="cap">
+                    <div className="cap-inner">
+                      {b.kicker && <p className="badge">{b.kicker}</p>}
+                      <p className="say">{b.text}</p>
+                    </div>
                   </div>
                 ))}
               </>
@@ -152,7 +223,7 @@ export default function Story() {
         {CHAPTERS.map((c, i) => (
           <a
             key={c.id}
-            href={`#${c.id}`}
+            href={"#" + c.id}
             aria-label={c.label}
             aria-current={i === active ? "step" : undefined}
             title={c.label}
@@ -163,12 +234,6 @@ export default function Story() {
           />
         ))}
       </nav>
-
-      {active < CHAPTERS.findIndex((c) => c.id === LAUNCH_CHAPTER) && (
-        <button className="skip" onClick={() => goTo(CHAPTERS.findIndex((c) => c.id === LAUNCH_CHAPTER))}>
-          Skip to launch
-        </button>
-      )}
     </>
   );
 }

@@ -445,15 +445,240 @@ html[data-clean] .plate-grade {
 }
 
 /* ---- The film, split into frames and scrubbed by scroll ---- */
-.plate.film-scroll {
-  opacity: 0;
-  transition: opacity 0.8s ease;
-}
-
-.plate.film-scroll[data-ready="true"] {
-  opacity: 1;
+/* The first frame is drawn as soon as it arrives; until then the plate is plain dark. */
+.plate.film-scroll canvas {
+  background: #0a0706;
 }
 
 html[data-clean] .plate.film-scroll .plate-dim {
   display: none;
+}
+
+/* ============================================================
+   Layout and type system: a framed picture, a top bar with a
+   centred pill menu, and centred serif captions pinned low over
+   a warm glow. Small labels stay in the system sans.
+   ============================================================ */
+:root {
+  --bg: #0a0706;
+  --frame: 10px;
+  --radius: 26px;
+  --display: var(--serif), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+
+/* The picture sits in a rounded frame with a dark margin around it */
+.plate.film-scroll {
+  inset: var(--frame);
+  border-radius: var(--radius);
+}
+
+/* Warm glow rising from the bottom, where the captions sit */
+.plate.film-scroll .plate-grade {
+  background:
+    linear-gradient(to top, rgb(32 10 6 / 0.9), rgb(60 20 12 / 0.55) 24%, rgb(60 20 12 / 0) 58%),
+    linear-gradient(to bottom, rgb(10 7 6 / 0.55), rgb(10 7 6 / 0) 22%);
+}
+
+/* ---- Top bar ---- */
+.bar {
+  position: fixed;
+  z-index: 3;
+  top: calc(var(--frame) + 18px);
+  left: calc(var(--frame) + 22px);
+  right: calc(var(--frame) + 22px);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.82rem;
+}
+
+.bar a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: start;
+  font-family: var(--display);
+  font-size: 1.45rem;
+  letter-spacing: -0.01em;
+}
+
+.brand-mark {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: var(--ink);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 3px, #000 3.5px);
+  mask: radial-gradient(circle at 50% 50%, transparent 3px, #000 3.5px);
+}
+
+.bar-nav {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.12);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.bar-nav a {
+  padding: 7px 14px;
+  border-radius: 7px;
+  color: rgb(242 239 233 / 0.86);
+}
+
+.bar-nav a:hover {
+  background: rgb(255 255 255 / 0.12);
+  color: var(--ink);
+}
+
+.bar-actions {
+  justify-self: end;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: rgb(10 7 6 / 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.pill {
+  padding: 7px 14px;
+  border-radius: 7px;
+  white-space: nowrap;
+}
+
+.bar .pill.solid {
+  background: var(--ink);
+  color: #14100e;
+  font-weight: 600;
+}
+
+.pill.ghost:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+
+/* ---- Captions: one at a time, centred, low in the picture ---- */
+.chapter,
+.chapter:not(:first-child) {
+  display: block;
+  position: relative;
+  min-height: 160vh;
+  padding: 0;
+}
+
+.chapter:first-child {
+  min-height: 100vh;
+  padding-top: 20vh;
+}
+
+/* The invisible slot a caption owns in the page; JS fades the caption while it passes */
+.cap {
+  height: 60vh;
+}
+
+.cap-inner {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--frame) + clamp(40px, 9vh, 96px));
+  width: min(46rem, calc(100vw - 2 * var(--frame) - 64px));
+  transform: translate(-50%, var(--rise, 0px));
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.badge {
+  display: inline-block;
+  margin: 0 0 1.1em;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: rgb(242 239 233 / 0.92);
+  background: rgb(20 12 10 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.cap-inner h1,
+.cap-inner h2,
+.say {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  text-wrap: balance;
+  text-shadow: 0 2px 30px rgb(20 8 4 / 0.55);
+}
+
+.cap-inner h1,
+.cap-inner h2 {
+  font-size: clamp(2.6rem, 6.4vw, 5.2rem);
+}
+
+.say {
+  font-size: clamp(1.7rem, 3.6vw, 3.1rem);
+  line-height: 1.08;
+}
+
+.sub {
+  margin: 1.2em auto 0;
+  max-width: 24rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgb(242 239 233 / 0.88);
+  text-wrap: balance;
+}
+
+/* Chapter dots tuck inside the frame */
+.dots {
+  right: calc(var(--frame) + 10px);
+}
+
+.legal {
+  text-align: center;
+}
+
+.legal p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+html[data-clean] .bar {
+  visibility: hidden;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --frame: 6px;
+    --radius: 18px;
+  }
+  .bar {
+    grid-template-columns: 1fr auto;
+    left: calc(var(--frame) + 14px);
+    right: calc(var(--frame) + 14px);
+  }
+  .bar-nav,
+  .pill.ghost {
+    display: none;
+  }
+  .brand {
+    font-size: 1.25rem;
+  }
+  .cap-inner {
+    width: calc(100vw - 2 * var(--frame) - 56px);
+  }
 }

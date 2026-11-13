@@ -29,7 +29,7 @@ None yet.
 
 | Files | What | Made with | Notes |
 |---|---|---|---|
-| `public/plates/film/000.webp` to `559.webp` | The page's picture: a 56-second film split into 560 frames (10 per second, 960 x 540) and scrubbed by scroll | Google Flow, Omni 1.2 Flash, 720p | Text prompts only, no input images. Labelled in the footer as an AI-generated illustration. Prompts are in `docs/flow-plates.md`. |
+| `public/plates/journey/000.webp` to `478.webp` | The page's picture: a 48-second film split into 479 frames (10 per second, 1280 x 720) and scrubbed by scroll | Google Flow, Veo 3.1 Fast, 720p | Text prompts only, no input images. Labelled in the footer as an AI-generated illustration. Prompts are in `docs/flow-plates.md`. |
 
 ## Imagery
 

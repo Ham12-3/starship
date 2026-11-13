@@ -1,17 +1,37 @@
 {
-  "base": "/plates/film/",
-  "count": 560,
-  "width": 960,
-  "height": 540,
+  "base": "/plates/journey/",
+  "count": 479,
+  "width": 1280,
+  "height": 720,
   "shot": 80,
   "anchors": [
-    ["top", 0],
-    ["rollout", 80],
-    ["fuelling", 160],
-    ["liftoff", 240],
-    ["staging", 345],
-    ["orbit", 400],
-    ["payload", 480],
-    ["re-entry", 559]
+    [
+      "top",
+      0
+    ],
+    [
+      "rollout",
+      80
+    ],
+    [
+      "liftoff",
+      160
+    ],
+    [
+      "staging",
+      240
+    ],
+    [
+      "orbit",
+      320
+    ],
+    [
+      "payload",
+      400
+    ],
+    [
+      "re-entry",
+      478
+    ]
   ]
 }
