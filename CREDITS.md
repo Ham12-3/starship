@@ -18,7 +18,8 @@ Every third-party asset, sound and library is logged here before it ships.
 |---|---|---|---|
 | Industrial Sunset (Pure Sky) HDRI, 1k | Poly Haven | CC0 | https://polyhaven.com/a/industrial_sunset_puresky |
 
-All rocket, tower and pad geometry is generated in code for this project.
+All rocket, tower and pad geometry is generated in code for this project (`blender/hero.py`, `components/hero/`).
+The hero plate is rendered with Blender (GPL; the licence does not apply to images made with it).
 
 ## Audio
 

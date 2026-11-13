@@ -12,3 +12,6 @@ reference/*
 blender/out
 
 .vercel
+
+# large render inputs, re-downloadable (see blender/README.md)
+blender/assets

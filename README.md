@@ -11,6 +11,7 @@ npm run build        # static site in /out
 
 Useful URLs in development:
 
+- `/?live` shows the real-time 3D scene instead of the rendered hero plate
 - `/?studio` opens the Theatre.js editor for camera keyframes
 - `/?webgl` forces the WebGL2 fallback
 - `/?tier=ultra|high|medium|mobile` pins a quality tier

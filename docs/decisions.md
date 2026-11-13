@@ -2,6 +2,24 @@
 
 Newest first. Each entry: what was chosen and why.
 
+## Hero moved to a path-traced plate (13 Nov 2026)
+
+**Why.** The owner judged the live hero shot fake, and the reference frames showed why: too few parts, no bounce
+light, subject too small. Three passes of real-time polish and three Google Flow clips did not change that.
+
+**What.** `blender/hero.py` builds the stack, tower, catch arms, mount, tank farm, people and vapour from
+`rockets.json` and path-traces one frame in Cycles: drone camera 365 m out, 42 mm lens, sun behind the pad, real
+captured sky at 4k. About 107,000 faces before bevels. The site shows that frame (`components/HeroPlate.tsx`) with a
+thin live layer: drifting vapour, blinking beacon, grain refreshed 24 times a second, slow push-in on scroll.
+
+**The live 3D scene is off by default.** It is still there behind `/?live` for the interactive chapters to come. This
+also takes the load off weak GPUs: the dev machine has integrated Intel graphics.
+
+**Limits of this route on this machine.** Stills render in minutes on the CPU. Fire, smoke and steam simulations and
+long sequences do not; those need a cloud GPU. The live layer is 2D, so the camera cannot move far.
+
+**Not from sources:** tower and mount shapes are generic, inspired by the references, not measured.
+
 ## Phase 1, first look-dev pass (13 Nov 2026)
 
 **Route: real-time first (Tier B).** Blender is not installed and there are no reference frames yet, so the hero shot
