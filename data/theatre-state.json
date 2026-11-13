@@ -1,0 +1,61 @@
+{
+  "sheetsById": {
+    "Story": {
+      "staticOverrides": { "byObject": {} },
+      "sequence": {
+        "subUnitsPerUnit": 30,
+        "length": 15,
+        "type": "PositionalSequence",
+        "tracksByObject": {
+          "Camera": {
+            "trackData": {
+              "trkDistance": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"distance\"]",
+                "keyframes": [
+                  { "id": "kd0", "position": 0, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 1400 },
+                  { "id": "kd1", "position": 7, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 420 },
+                  { "id": "kd2", "position": 15, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 2600 }
+                ]
+              },
+              "trkHeight": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"height\"]",
+                "keyframes": [
+                  { "id": "kh0", "position": 0, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 1.6 },
+                  { "id": "kh1", "position": 7, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 1.6 },
+                  { "id": "kh2", "position": 15, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 40 }
+                ]
+              },
+              "trkBearing": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"bearing\"]",
+                "keyframes": [
+                  { "id": "kb0", "position": 0, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": -12 },
+                  { "id": "kb1", "position": 15, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 28 }
+                ]
+              },
+              "trkFocal": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"focalLength\"]",
+                "keyframes": [
+                  { "id": "kf0", "position": 0, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 400 },
+                  { "id": "kf1", "position": 7, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 135 },
+                  { "id": "kf2", "position": 15, "connectedRight": true, "handles": [0.5, 1, 0.5, 0], "type": "bezier", "value": 600 }
+                ]
+              }
+            },
+            "trackIdByPropPath": {
+              "[\"distance\"]": "trkDistance",
+              "[\"height\"]": "trkHeight",
+              "[\"bearing\"]": "trkBearing",
+              "[\"focalLength\"]": "trkFocal"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitionVersion": "0.4.0",
+  "revisionHistory": ["phase0-placeholder"]
+}

@@ -1,0 +1,710 @@
+{
+  "$schema": "./rockets.schema.json",
+  "asOf": "2026-11-13",
+  "hero": {
+    "id": "starship-v3",
+    "name": "Starship V3",
+    "operator": "SpaceX (USA)",
+    "stackHeight": {
+      "value": 124.4,
+      "unit": "m",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "diameter": {
+      "value": 9,
+      "unit": "m",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "liftoffMass": {
+      "value": 5000,
+      "unit": "t",
+      "approx": true,
+      "note": "Sources range 5,000 to 5,300 t. Show \"about 5,000 tonnes\".",
+      "verified": true,
+      "source": "https://newspaceeconomy.ca/2026/04/16/detailed-review-of-starship-v3/",
+      "asOf": "2026-11-13"
+    },
+    "boosterHeight": {
+      "value": 72.3,
+      "unit": "m",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "boosterEngines": {
+      "value": 33,
+      "unit": "count",
+      "note": "Raptor 3. Outer 20 fixed in a ring, inner 13 gimbal.",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "boosterLiftoffThrust": {
+      "value": 90.6,
+      "unit": "MN",
+      "approx": true,
+      "note": "UNRESOLVED. The brief said ~80.8 MN (= 33 x 250 tf). Most 2026 sources say ~9,200 to 9,240 tf (= 33 x 280 tf, ~90.6 MN), which matches the 280 tf per-engine figure. Range 80.8 to 90.6. Needs owner sign-off before it goes on screen.",
+      "verified": false,
+      "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
+      "asOf": "2026-11-13"
+    },
+    "raptor3Thrust": {
+      "value": 280,
+      "unit": "tf",
+      "approx": true,
+      "note": "Sea level. Sources range 250 to 330 tf; 280 tf is the figure most often quoted. No external engine heat shield.",
+      "verified": true,
+      "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
+      "asOf": "2026-11-13"
+    },
+    "shipHeight": {
+      "value": 52.1,
+      "unit": "m",
+      "approx": true,
+      "note": "Derived: 124.4 - 72.3. One low-reliability source says ~53 m. No official V3 ship height found.",
+      "verified": false,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "shipEngines": {
+      "value": 6,
+      "unit": "count",
+      "note": "3 sea-level Raptor 3 + 3 Raptor Vacuum.",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "boosterPropellant": {
+      "value": 3650,
+      "unit": "t",
+      "approx": true,
+      "verified": true,
+      "source": "https://newspaceeconomy.ca/2026/04/16/detailed-review-of-starship-v3/",
+      "asOf": "2026-11-13"
+    },
+    "shipPropellant": {
+      "value": 1600,
+      "unit": "t",
+      "approx": true,
+      "verified": true,
+      "source": "https://newspaceeconomy.ca/2026/04/16/detailed-review-of-starship-v3/",
+      "asOf": "2026-11-13"
+    },
+    "payloadToLEO": {
+      "value": 100,
+      "unit": "t",
+      "approx": true,
+      "note": "100+ t reusable, target 100 to 150 t.",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "gridFins": {
+      "value": 3,
+      "unit": "count",
+      "note": "Block 3: 3 fins (down from 4), about 1.5x larger, double as catch points.",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+      "asOf": "2026-11-13"
+    },
+    "heatShieldTiles": {
+      "value": null,
+      "unit": "count",
+      "note": "No V3 tile count published. ~18,000 applies to Block 1/2 only. Do not show a number.",
+      "verified": false,
+      "source": "https://newspaceeconomy.ca/2026/04/16/detailed-review-of-starship-v3/",
+      "asOf": "2026-11-13"
+    },
+    "orbitAltitude": {
+      "value": 275,
+      "unit": "km",
+      "approx": true,
+      "verified": true,
+      "source": "https://www.theweek.in/news/sci-tech/2026/11/11/spacex-starship-flight-15-launch.html",
+      "asOf": "2026-11-13"
+    },
+    "launchSite": {
+      "value": "Starbase, Texas, Orbital Launch Pad 2",
+      "unit": "text",
+      "verified": true,
+      "source": "https://en.wikipedia.org/wiki/List_of_Starship_launches",
+      "asOf": "2026-11-13"
+    }
+  },
+  "facilities": {
+    "starbaseBuildings": {
+      "value": "Starfactory, Mega Bay 1, Mega Bay 2, Gigabay (under construction, target end of 2026)",
+      "unit": "text",
+      "note": "Names confirmed. Claims from Oct 2026 that the Gigabay is operational are unconfirmed.",
+      "verified": true,
+      "source": "https://www.nasaspaceflight.com/2026/01/starship-foundations-2026/",
+      "asOf": "2026-11-13"
+    },
+    "floridaLC39A": {
+      "value": "No Starship launch yet. Pad reported substantially complete Oct 2026. FAA approved up to 44 launches a year on 30 Jan 2026. No confirmed first-launch date.",
+      "unit": "text",
+      "verified": false,
+      "source": "https://spaceflightnow.com/2026/02/06/spacex-shifts-away-from-dragon-launches-at-pad-39a-as-starship-looms/",
+      "asOf": "2026-11-13"
+    }
+  },
+  "flight15": {
+    "status": {
+      "value": "pending",
+      "unit": "text",
+      "note": "Checked on the morning of 13 Nov 2026: the launch (NET 22:45 UTC) had not happened yet. Booster 22 / Ship 42, first dual-catch attempt. Re-check after 14 Nov.",
+      "verified": false,
+      "source": "https://www.space.com/news/live/spacex-starship-flight-15-live-updates-nov-11-2026-starship-first-double-landing-attempt",
+      "asOf": "2026-11-13"
+    },
+    "timeline": [
+      {
+        "t": "0:00:00",
+        "event": "Liftoff",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:00:58",
+        "event": "Max Q",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:02:19",
+        "event": "Booster engine cutoff (MECO)",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:02:21",
+        "event": "Hot staging",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:02:26",
+        "event": "Boostback burn starts",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:03:02",
+        "event": "Boostback burn ends",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:06:10",
+        "event": "Booster landing burn",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:06:35",
+        "event": "Booster caught by the tower",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:08:09",
+        "event": "Ship engine cutoff (SECO)",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:26:10",
+        "event": "Orbital insertion burn",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "0:35:01",
+        "event": "Satellite deploy starts",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "1:17:40",
+        "event": "Satellite deploy ends",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "21:36:00",
+        "event": "Deorbit burn",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "22:10:46",
+        "event": "Ship enters the atmosphere",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "22:32:16",
+        "event": "Flip and landing burn",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      },
+      {
+        "t": "22:32:34",
+        "event": "Ship caught by the tower",
+        "planned": true,
+        "source": "https://en.wikipedia.org/wiki/Starship_flight_15",
+        "asOf": "2026-11-13"
+      }
+    ]
+  },
+  "history": [
+    {
+      "date": "2024-10-13",
+      "flight": "Flight 5",
+      "summary": "First ever booster catch.",
+      "source": "https://en.wikipedia.org/wiki/List_of_Starship_launches",
+      "asOf": "2026-11-13"
+    },
+    {
+      "date": "2026-05-22",
+      "flight": "Flight 12",
+      "summary": "First V3 flight, first launch from Pad 2. Ship splashed down under control, booster lost.",
+      "source": "https://en.wikipedia.org/wiki/List_of_Starship_launches",
+      "asOf": "2026-11-13"
+    },
+    {
+      "date": "2026-07-24",
+      "flight": "Flight 13",
+      "summary": "Ship splashed down in the Indian Ocean and survived tipping over.",
+      "source": "https://en.wikipedia.org/wiki/List_of_Starship_launches",
+      "asOf": "2026-11-13"
+    },
+    {
+      "date": "2026-09-28",
+      "flight": "Flight 14",
+      "summary": "First orbital Starship flight. Deployed 26 Starlink V3 satellites (about 44 t).",
+      "source": "https://en.wikipedia.org/wiki/List_of_Starship_launches",
+      "asOf": "2026-11-13"
+    }
+  ],
+  "comparison": [
+    {
+      "id": "starship-v3",
+      "name": "Starship V3",
+      "operator": "SpaceX (USA)",
+      "height": {
+        "value": 124.4,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 9,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 90.6,
+        "unit": "MN",
+        "approx": true,
+        "note": "See hero.boosterLiftoffThrust: unresolved, 80.8 to 90.6.",
+        "verified": false,
+        "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 100,
+        "unit": "t",
+        "approx": true,
+        "note": "100+ t reusable",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "Flying, orbital since Sep 2026",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "saturn-v",
+      "name": "Saturn V",
+      "operator": "NASA (USA)",
+      "height": {
+        "value": 110.6,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Saturn_V",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 10.1,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Saturn_V",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 34.5,
+        "unit": "MN",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Saturn_V",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 140,
+        "unit": "t",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Saturn_V",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "Retired 1973",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Saturn_V",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "sls-block-1",
+      "name": "SLS Block 1",
+      "operator": "NASA / Boeing / Northrop Grumman (USA)",
+      "height": {
+        "value": 98,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Space_Launch_System",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 8.4,
+        "unit": "m",
+        "note": "Core stage",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Space_Launch_System",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 39,
+        "unit": "MN",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Space_Launch_System",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 95,
+        "unit": "t",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Space_Launch_System",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "Flew Artemis II crew around the Moon, 1 to 11 Apr 2026",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Space_Launch_System",
+        "asOf": "2026-11-13"
+      },
+      "details": {
+        "value": "4 RS-25 engines, two 54 m five-segment solid boosters (14.6 MN each at sea level). Core built at NASA Michoud, stacked in the Vehicle Assembly Building, launched from LC-39B. Artemis II record distance from Earth: 406,771 km.",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Artemis_II",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "new-glenn",
+      "name": "New Glenn (7x2)",
+      "operator": "Blue Origin (USA)",
+      "height": {
+        "value": 98,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Glenn",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 7,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Glenn",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 17,
+        "unit": "MN",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Glenn",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 45,
+        "unit": "t",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Glenn",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "3 flights. Pad LC-36 damaged in May 2026. Taller 9x4 version planned",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Glenn",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "long-march-10",
+      "name": "Long March 10",
+      "operator": "CASC / CMSA (China)",
+      "height": {
+        "value": 92.5,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Long_March_10",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 5,
+        "unit": "m",
+        "note": "Each core is 5 m; three cores side by side",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Long_March_10",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 26,
+        "unit": "MN",
+        "approx": true,
+        "note": "21 x YF-100K",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Long_March_10",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 70,
+        "unit": "t",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Long_March_10",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "For crewed Moon landing by 2030",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Long_March_10",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "falcon-heavy",
+      "name": "Falcon Heavy",
+      "operator": "SpaceX (USA)",
+      "height": {
+        "value": 70,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_Heavy",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 3.7,
+        "unit": "m",
+        "note": "Three 3.7 m cores",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_Heavy",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 22.8,
+        "unit": "MN",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_Heavy",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 63.8,
+        "unit": "t",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_Heavy",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "12 launches, 12 successes",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_Heavy",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "falcon-9",
+      "name": "Falcon 9 Block 5",
+      "operator": "SpaceX (USA)",
+      "height": {
+        "value": 69.8,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_9",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 3.7,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_9",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 7.6,
+        "unit": "MN",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_9",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 22.8,
+        "unit": "t",
+        "note": "Expendable",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_9",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "Workhorse. One booster has flown 35+ times",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Falcon_9",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "ariane-64",
+      "name": "Ariane 64",
+      "operator": "ESA / ArianeGroup / Arianespace (Europe)",
+      "height": {
+        "value": 63,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Ariane_6",
+        "asOf": "2026-11-13"
+      },
+      "diameter": {
+        "value": 5.4,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Ariane_6",
+        "asOf": "2026-11-13"
+      },
+      "liftoffThrust": {
+        "value": 20,
+        "unit": "MN",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Ariane_6",
+        "asOf": "2026-11-13"
+      },
+      "payloadToLEO": {
+        "value": 21.6,
+        "unit": "t",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Ariane_6",
+        "asOf": "2026-11-13"
+      },
+      "status": {
+        "value": "First flight 12 Feb 2026, success",
+        "unit": "text",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Ariane_6",
+        "asOf": "2026-11-13"
+      }
+    }
+  ],
+  "scaleReferences": [
+    {
+      "id": "big-ben",
+      "name": "Elizabeth Tower (Big Ben)",
+      "height": {
+        "value": 96,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Big_Ben",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "liberty",
+      "name": "Statue of Liberty with pedestal",
+      "height": {
+        "value": 93,
+        "unit": "m",
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Statue_of_Liberty",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "bus",
+      "name": "London double-decker bus",
+      "height": {
+        "value": 4.4,
+        "unit": "m",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Routemaster",
+        "asOf": "2026-11-13"
+      },
+      "length": {
+        "value": 11,
+        "unit": "m",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/New_Routemaster",
+        "asOf": "2026-11-13"
+      }
+    },
+    {
+      "id": "person",
+      "name": "Adult person",
+      "height": {
+        "value": 1.75,
+        "unit": "m",
+        "approx": true,
+        "verified": true,
+        "source": "https://en.wikipedia.org/wiki/Human_height",
+        "asOf": "2026-11-13"
+      }
+    }
+  ]
+}

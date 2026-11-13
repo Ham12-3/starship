@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Factory to Orbit: rocket facts",
+  "type": "object",
+  "required": ["asOf", "hero", "facilities", "flight15", "history", "comparison", "scaleReferences"],
+  "additionalProperties": false,
+  "definitions": {
+    "fact": {
+      "type": "object",
+      "required": ["value", "unit", "verified", "source", "asOf"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": ["number", "string", "null"] },
+        "unit": { "enum": ["m", "km", "t", "tf", "MN", "count", "text"] },
+        "approx": { "type": "boolean" },
+        "verified": { "type": "boolean" },
+        "note": { "type": "string" },
+        "source": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "asOf": { "type": "string", "format": "date" }
+      }
+    },
+    "sourced": {
+      "type": "object",
+      "required": ["source", "asOf"],
+      "properties": {
+        "source": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "asOf": { "type": "string", "format": "date" }
+      }
+    },
+    "factMap": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/fact" }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "asOf": { "type": "string", "format": "date" },
+    "hero": {
+      "type": "object",
+      "required": ["id", "name", "operator", "stackHeight", "diameter", "boosterHeight", "boosterEngines", "gridFins"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "operator": { "type": "string" }
+      },
+      "additionalProperties": { "$ref": "#/definitions/fact" }
+    },
+    "facilities": { "$ref": "#/definitions/factMap" },
+    "flight15": {
+      "type": "object",
+      "required": ["status", "timeline"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "$ref": "#/definitions/fact" },
+        "timeline": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "allOf": [{ "$ref": "#/definitions/sourced" }],
+            "required": ["t", "event", "planned"],
+            "properties": {
+              "t": { "type": "string", "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$" },
+              "event": { "type": "string" },
+              "planned": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "allOf": [{ "$ref": "#/definitions/sourced" }],
+        "required": ["date", "flight", "summary"],
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "flight": { "type": "string" },
+          "summary": { "type": "string" }
+        }
+      }
+    },
+    "comparison": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "operator", "height", "diameter", "liftoffThrust", "payloadToLEO", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "operator": { "type": "string" }
+        },
+        "additionalProperties": { "$ref": "#/definitions/fact" }
+      }
+    },
+    "scaleReferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "height"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        },
+        "additionalProperties": { "$ref": "#/definitions/fact" }
+      }
+    }
+  }
+}
