@@ -1,0 +1,17 @@
+{
+  "base": "/plates/film/",
+  "count": 560,
+  "width": 960,
+  "height": 540,
+  "shot": 80,
+  "anchors": [
+    ["top", 0],
+    ["rollout", 80],
+    ["fuelling", 160],
+    ["liftoff", 240],
+    ["staging", 345],
+    ["orbit", 400],
+    ["payload", 480],
+    ["re-entry", 559]
+  ]
+}

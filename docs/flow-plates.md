@@ -1,7 +1,7 @@
 # Generated plates (Google Flow)
 
 Flow clips are a stand-in for the path-traced Tier A plates until Blender is set up. They cannot be re-rendered from a
-script, so every attempt is logged here: input, settings, prompt, verdict. The three plate attempts below are not on the site. The short film at the end of this file is.
+script, so every attempt is logged here: input, settings, prompt, verdict. The three plate attempts below are not on the site. The film at the end of this file is: its frames are the page's picture.
 
 Rules:
 
@@ -65,17 +65,23 @@ So Flow is not a shortcut around a better model. Where it can still help:
 - Later, starting from a much better frame (the Phase 2 Blender model, path-traced), where there is less for the model
   to fix.
 
-## The short film (13 Nov 2026): on the site
+## The film (13 Nov 2026): on the site, as scroll-scrubbed frames
 
-Not a plate. A separate, clearly labelled film in its own section (`components/Film.tsx`, `/#film`), linked from the
-hero. The scroll story still uses our own renders only.
+At the owner's request the film replaces the rendered model as the page's picture. It is split into frames and
+scrubbed by scroll (`components/FilmScroll.tsx`, `data/film-plate.json`). The Blender plates, NASA photo chapters and
+their components stay in the repo but are not rendered. This sets aside the "our own renders only" rule above.
 
 - Flow project: "Nov 13 - 17:04". Scene: "Untitled Scene 11-13 17:07:39".
 - Model: Omni 1.2 Flash, 720p, 8 s, 16:9, 1 output each, text only. Seven clips, 168 credits.
 - Every prompt ends: "Photoreal, cinematic, anamorphic lens, natural film grain, no on-screen text, no subtitles. A
-  calm, deep documentary narrator says in voice-over: "..."". The seven shot descriptions and narration lines are in
-  `higgsfield/shots.md` (written for Higgsfield first; that account had no credits, so Flow was used).
-- Export: 1280 x 720, 24 fps, 50.7 MB. Re-encoded for the site with ffmpeg (H.264, CRF 26, faststart) to 8 MB.
-- Checked: one frame from each shot matches its brief. Not checked: the narration audio, and motion between frames.
-- Known gaps against the brief: the rocket's shape differs from shot to shot and is not our model; the engine shot
-  does not show 33 engines; planets are shown in a line, which is not how they sit in the sky.
+  calm, deep documentary narrator says in voice-over: "..."". The seven shot descriptions are in `higgsfield/shots.md`
+  (written for Higgsfield first; that account had no credits, so Flow was used). The narration is not used: frames
+  have no sound.
+- Frames: `ffmpeg -i <export>.mp4 -vf "fps=10,scale=960:540:flags=lanczos" -c:v libwebp -quality 62
+  public/plates/film/%03d.webp`. 560 frames, 12 MB. Only frames near the playhead are loaded.
+- Shots are pinned to chapters in `data/film-plate.json`: factory (top to testing), rollout, pad (fuelling), engines
+  and climb (liftoff to booster catch), space (orbit, beyond), satellites (payload). Later chapters hold the last
+  frame, dimmed.
+- Known gaps: there is no footage of hot staging, the booster catch, re-entry or the ship catch, so that copy sits
+  over other shots. The rocket's shape differs from shot to shot; the engine shot does not show 33 engines; planets
+  are shown in a line.

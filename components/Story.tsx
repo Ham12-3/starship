@@ -128,19 +128,6 @@ export default function Story() {
                 <p className="lede">
                   {Math.round(Math.round(height) * 3.28084)} feet ({Math.round(height)} metres) of steel, built to fly to orbit and come back.
                 </p>
-                <a
-                  className="film-link"
-                  href="#film"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const el = document.getElementById("film");
-                    if (!el) return;
-                    if (lenisRef.current) lenisRef.current.scrollTo(el, { force: true });
-                    else el.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  ▶ Watch the 56-second film
-                </a>
                 <p className="cue">Scroll to begin</p>
               </div>
             ) : (

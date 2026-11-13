@@ -23,15 +23,17 @@ The hero plate is rendered with Blender (GPL; the licence does not apply to imag
 
 ## Audio
 
-The short film's narration and sound are generated with the film itself (see below). No other audio.
+None yet.
 
-## Generated film
+## Generated film frames
 
-| File | What | Made with | Notes |
+| Files | What | Made with | Notes |
 |---|---|---|---|
-| `public/film/factory-to-orbit.mp4`, `poster.webp` | 56-second narrated film, seven 8-second clips | Google Flow, Omni 1.2 Flash, 720p | Text prompts only, no input images. Labelled on the page as an AI-generated illustration. Prompts are in `docs/flow-plates.md`. |
+| `public/plates/film/000.webp` to `559.webp` | The page's picture: a 56-second film split into 560 frames (10 per second, 960 x 540) and scrubbed by scroll | Google Flow, Omni 1.2 Flash, 720p | Text prompts only, no input images. Labelled in the footer as an AI-generated illustration. Prompts are in `docs/flow-plates.md`. |
 
 ## Imagery
+
+Not shown while the film is the page's picture; kept for the photo chapters (`components/PhotoChapter.tsx`).
 
 NASA imagery, used under NASA's media guidelines for educational web pages: credited, no NASA logos, no endorsement
 implied. Each file in `public/space/` is cropped and re-encoded; nothing else is changed.
