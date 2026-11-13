@@ -99,7 +99,7 @@ export default function Scene({ tier, onBenchmark, onReady }: { tier: TierName; 
     <>
       <CameraRig />
       <Governor tier={tier} onBenchmark={onBenchmark} />
-      <GoldenShot onReady={onReady} />
+      <GoldenShot onReady={onReady} shadows={tier === "ultra" || tier === "high"} />
       <Post tier={tier} />
     </>
   );

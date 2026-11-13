@@ -37,3 +37,22 @@ Known tells, in rough order of how much they give the shot away:
 6. Sky is a flat gradient with no cloud structure or stars.
 7. Lamps have no lens flare or starburst.
 8. No people, no moving vehicles, no birds.
+
+### Second pass (13 Nov 2026)
+
+Done from the list above: denser tower (lift core, stairs, pipe bundles, cable trays, platforms, crane jib), truss
+catch arms and ship arm, floodlight shadows on the two camera-side masts (Ultra and High tiers), dented steel, dunes
+with scrub, utility poles, lagoons, heavier and more varied vapour, lamp glints with diffraction spikes, a blinking
+tower beacon and a truck driving the access road.
+
+Still giving it away:
+
+1. Ground strip is plain and the lagoons barely read. Wants a real waterline with reflections of the lit stack.
+2. Sky is one smooth gradient: no cloud structure, no stars.
+3. Steel reads well on the ship, but the frosted booster is a flat pale column.
+4. Vapour is still sprites. Good enough at this distance, not closer.
+5. No people. Nothing yet tells the eye how big a person is next to this.
+6. Shadows are in but subtle. Needs checking against a real floodlit frame.
+
+Measured in the dev browser pane (800 x 521, small): about 16.6 ms a frame on the WebGL2 path with the full scene.
+Not yet measured at full-screen size or on a phone.

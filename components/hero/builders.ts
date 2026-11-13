@@ -164,12 +164,30 @@ function steelMaps(o: SteelOpts) {
     }
   }
 
-  return { map: tex(cc, true), orm: tex(mc, false) };
+  // Oil-canning: thin sheet between welds bows in and out, breaking up reflections
+  const [bc, b] = canvas(512, 1024);
+  b.fillStyle = "rgb(128,128,128)";
+  b.fillRect(0, 0, 512, 1024);
+  for (let i = 0; i < 420; i++) {
+    const x = rand() * 512;
+    const yy = rand() * 1024;
+    const r = 14 + rand() * 46;
+    const gr = b.createRadialGradient(x, yy, 0, x, yy, r);
+    gr.addColorStop(0, rand() > 0.5 ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.22)");
+    gr.addColorStop(1, "rgba(128,128,128,0)");
+    b.fillStyle = gr;
+    b.fillRect(x - r, yy - r, r * 2, r * 2);
+  }
+  for (let h0 = 0; h0 < o.heightM; h0 += ring) {
+    b.fillStyle = "rgba(255,255,255,0.5)";
+    b.fillRect(0, 1024 - (h0 / o.heightM) * 1024 - 1.5, 512, 2);
+  }
+  return { map: tex(cc, true), orm: tex(mc, false), bump: tex(bc, false) };
 }
 
 function steelMaterial(o: SteelOpts) {
-  const { map, orm } = steelMaps(o);
-  return new THREE.MeshStandardMaterial({ map, roughnessMap: orm, metalnessMap: orm, roughness: 1, metalness: 1, envMapIntensity: 1 });
+  const { map, orm, bump } = steelMaps(o);
+  return new THREE.MeshStandardMaterial({ map, roughnessMap: orm, metalnessMap: orm, bumpMap: bump, bumpScale: 1.4, roughness: 1, metalness: 1 });
 }
 
 /** Heat-shield tiles: near-black, slightly uneven, a few newer and chipped ones. */
@@ -300,6 +318,63 @@ export function buildTower() {
       add(b, a.clone().setY((l + 1) * bay), 0.36);
     }
   }
+  // Secondary structure: what makes a real tower read as dense, not as a diagram.
+  const V = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
+  // Lift shaft and stair core
+  add(V(-2, 0, -2), V(-2, TOWER_H, -2), 3.2);
+  // Zig-zag stairs up the back face
+  for (let l = 0; l < levels; l++) add(V(-W / 2 - 0.6, l * bay, l % 2 ? -5 : 5), V(-W / 2 - 0.6, (l + 1) * bay, l % 2 ? 5 : -5), 0.3);
+  // Propellant and purge lines, in bundles, up the face nearest the rocket
+  for (let i = 0; i < 9; i++) {
+    const z = -4.6 + i * 1.15 + (i % 3 === 0 ? 0.3 : 0);
+    const top = i < 4 ? PAD_H + BOOSTER_H + 8 : i < 7 ? PAD_H + 6 + i * 9 : TOWER_H - 4;
+    add(V(W / 2 + 0.7, 0, z), V(W / 2 + 0.7, top, z), i % 2 ? 0.42 : 0.26);
+  }
+  // Cable trays on the side faces
+  for (const z of [-W / 2 - 0.5, W / 2 + 0.5]) for (const x of [-3, 1.5, 3.4]) add(V(x, 0, z), V(x, TOWER_H - 10, z), 0.3);
+  // Work platforms with handrails
+  for (let y = 12; y < TOWER_H; y += 18) {
+    for (const z of [-W / 2 - 1.1, W / 2 + 1.1]) {
+      add(V(-W / 2 - 1, y, z), V(W / 2 + 1, y, z), 0.5);
+      add(V(-W / 2 - 1, y + 1.1, z), V(W / 2 + 1, y + 1.1, z), 0.09);
+    }
+  }
+  // Catch arms: open trusses, hinged at the carriage, parked either side of the stack
+  const armY0 = PAD_H + 61;
+  for (const side of [1, -1]) {
+    const z0 = side * 6.5;
+    const z1 = side * 10.5;
+    const x0 = W / 2 + 2;
+    const x1 = W / 2 + 37;
+    const P = (t: number, dy: number, dz: number) => V(x0 + (x1 - x0) * t, armY0 + dy * (1 - t * 0.35), z0 + (z1 - z0) * t + dz);
+    const n = 9;
+    for (const dz of [-0.9, 0.9]) {
+      add(P(0, 1.6, dz), P(1, 1.6, dz), 0.55);
+      add(P(0, -1.6, dz), P(1, -1.6, dz), 0.55);
+      for (let i = 0; i < n; i++) {
+        add(P(i / n, -1.6, dz), P((i + 1) / n, 1.6, dz), 0.26);
+        add(P(i / n, 1.6, dz), P(i / n, -1.6, dz), 0.22);
+      }
+    }
+    for (let i = 0; i <= n; i++) add(P(i / n, 1.6, -0.9), P(i / n, 1.6, 0.9), 0.22);
+    // Landing rail along the inner top edge
+    add(P(0.3, 2.1, -side * 0.9), P(1, 2.1, -side * 0.9), 0.4);
+  }
+  // Hoist cables from the tower head down to the carriage
+  for (const z of [-3, 3]) add(V(W / 2 + 1.4, armY0 + 4, z), V(W / 2 + 1.4, TOWER_H, z), 0.12);
+  // Ship arm as a truss with a drooping hose bundle
+  {
+    const y = PAD_H + BOOSTER_H + 6;
+    for (const dy of [-1.5, 1.5]) for (const dz of [-3, 0]) add(V(W / 2, y + dy, dz), V(W / 2 + 14.5, y + dy, dz), 0.4);
+    for (let i = 0; i < 6; i++) add(V(W / 2 + i * 2.4, y - 1.5, 0), V(W / 2 + (i + 1) * 2.4, y + 1.5, 0), 0.22);
+    const sag = (i: number) => y - 1.7 - Math.sin((i / 5) * Math.PI) * 1.6;
+    for (let i = 0; i < 5; i++) add(V(W / 2 + 2 + i * 2.5, sag(i), -1.5), V(W / 2 + 4.5 + i * 2.5, sag(i + 1), -1.5), 0.3);
+  }
+  // Crane jib on the tower head
+  add(V(-2, TOWER_H + 3, 0), V(9, TOWER_H + 7, 0), 0.5);
+  add(V(-2, TOWER_H + 3, 0), V(-2, TOWER_H + 8, 0), 0.5);
+  add(V(-2, TOWER_H + 8, 0), V(9, TOWER_H + 7, 0), 0.2);
+
   const lattice = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), mat, boxes.length);
   boxes.forEach((b, i) => lattice.setMatrixAt(i, b));
   g.add(lattice);
@@ -314,9 +389,8 @@ export function buildTower() {
   // Carriage and the two catch arms, parked open either side of the stack
   const armY = PAD_H + 61;
   box(3, 9, 16, W / 2 + 1.2, armY, 0);
-  for (const side of [1, -1]) box(36, 2.4, 1.8, W / 2 + 19, armY, side * 9.5, side * -0.1);
   // Ship quick-disconnect arm
-  box(15, 3.2, 3.4, W / 2 + 7, PAD_H + BOOSTER_H + 6, -1.5);
+  box(2.6, 4, 4.2, W / 2 + 14.2, PAD_H + BOOSTER_H + 6, -1.5);
   // Booster quick-disconnect hood near the base
   box(11, 5, 4, W / 2 + 4.5, PAD_H + 3, 0);
   // Cap and lightning rod
@@ -455,6 +529,110 @@ export function puffTexture(seed: number) {
     gr.addColorStop(1, "rgba(255,255,255,0)");
     c.fillStyle = gr;
     c.fillRect(0, 0, s, s);
+  }
+  const t = new THREE.CanvasTexture(cc);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+/**
+ * Foreground between the camera and the pad: low dunes with dark scrub and a
+ * line of utility poles. Gives the long lens something near to compress
+ * against the pad. `toward` is the camera position on the ground.
+ */
+export function buildForeground(toward: THREE.Vector3) {
+  const g = new THREE.Group();
+  const rand = rng(404);
+  const dir = toward.clone().setY(0).normalize();
+  const side = new THREE.Vector3(dir.z, 0, -dir.x);
+  const dist = toward.length();
+  const sand = new THREE.MeshStandardMaterial({ color: "#3b382e", roughness: 1 });
+  const scrub = new THREE.MeshStandardMaterial({ color: "#161a12", roughness: 1 });
+  const dunes: THREE.Matrix4[] = [];
+  const bushes: THREE.Matrix4[] = [];
+  const m = new THREE.Matrix4();
+  const q = new THREE.Quaternion();
+  const up = new THREE.Vector3(0, 1, 0);
+  for (let i = 0; i < 70; i++) {
+    const d = 380 + Math.pow(rand(), 1.4) * (dist - 900);
+    const lateral = (rand() - 0.5) * (220 + d * 0.16);
+    const p = dir.clone().multiplyScalar(d).addScaledVector(side, lateral);
+    const w = 30 + rand() * 110;
+    const h = 0.8 + rand() * 3.6 * Math.min(1, d / 1500);
+    q.setFromAxisAngle(up, rand() * Math.PI);
+    m.compose(new THREE.Vector3(p.x, -0.1, p.z), q, new THREE.Vector3(w, h, w * (0.3 + rand() * 0.4)));
+    dunes.push(m.clone());
+    const n = 3 + Math.floor(rand() * 9);
+    for (let k = 0; k < n; k++) {
+      const a = rand() * Math.PI * 2;
+      const r = rand() * 0.75;
+      const sz = 0.6 + rand() * 1.8;
+      m.compose(
+        new THREE.Vector3(p.x + Math.cos(a) * r * w * 0.6, h * (1 - r * r) * 0.9, p.z + Math.sin(a) * r * w * 0.25),
+        q,
+        new THREE.Vector3(sz * (1 + rand()), sz * 0.7, sz),
+      );
+      bushes.push(m.clone());
+    }
+  }
+  const duneMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), sand, dunes.length);
+  dunes.forEach((d, i) => duneMesh.setMatrixAt(i, d));
+  const bushMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), scrub, bushes.length);
+  bushes.forEach((d, i) => bushMesh.setMatrixAt(i, d));
+  g.add(duneMesh, bushMesh);
+
+  // Tidal lagoons: long sheets of still water lying across the view. At this
+  // grazing angle they mirror the sky just above the horizon.
+  const water = new THREE.MeshStandardMaterial({ color: "#0d1116", roughness: 0.06, metalness: 0 });
+  const disc = new THREE.CircleGeometry(1, 48);
+  for (const [d, lateral, len, wid] of [
+    [520, -40, 520, 46],
+    [900, 120, 700, 70],
+    [1500, -160, 900, 110],
+    [2300, 60, 1300, 150],
+    [3100, -220, 900, 90],
+  ]) {
+    const p = dir.clone().multiplyScalar(d).addScaledVector(side, lateral);
+    const pool = new THREE.Mesh(disc, water);
+    pool.rotation.set(-Math.PI / 2, 0, Math.atan2(side.x, side.z) - Math.PI / 2);
+    pool.scale.set(len, wid, 1);
+    pool.position.set(p.x, 0.06, p.z);
+    pool.receiveShadow = true;
+    g.add(pool);
+  }
+
+  const pole = new THREE.MeshStandardMaterial({ color: "#1c1a17", roughness: 0.9 });
+  for (let i = 0; i < 14; i++) {
+    const p = dir.clone().multiplyScalar(260 + i * 85).addScaledVector(side, 150 - i * 4);
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 11, 6), pole);
+    post.position.set(p.x, 5.5, p.z);
+    const arm = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.14, 0.14), pole);
+    arm.position.set(p.x, 10.3, p.z);
+    arm.rotation.y = Math.atan2(side.x, side.z) + Math.PI / 2;
+    g.add(post, arm);
+  }
+  return g;
+}
+
+/** Lamp glint: a soft core with thin diffraction spikes, as a stopped-down long lens draws it. */
+export function glintTexture() {
+  const s = 256;
+  const [cc, c] = canvas(s, s);
+  const core = c.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  core.addColorStop(0, "rgba(255,255,255,1)");
+  core.addColorStop(0.06, "rgba(255,246,230,0.55)");
+  core.addColorStop(0.25, "rgba(255,240,220,0.035)");
+  core.addColorStop(1, "rgba(255,240,220,0)");
+  c.fillStyle = core;
+  c.fillRect(0, 0, s, s);
+  c.translate(s / 2, s / 2);
+  for (let i = 0; i < 6; i++) {
+    c.rotate(Math.PI / 3);
+    const sp = c.createLinearGradient(0, 0, s / 2, 0);
+    sp.addColorStop(0, "rgba(255,250,240,0.55)");
+    sp.addColorStop(1, "rgba(255,250,240,0)");
+    c.fillStyle = sp;
+    c.fillRect(0, -0.7, s / 2, 1.4);
   }
   const t = new THREE.CanvasTexture(cc);
   t.colorSpace = THREE.SRGBColorSpace;

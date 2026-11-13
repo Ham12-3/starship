@@ -17,6 +17,7 @@ async function createRenderer(canvas: HTMLCanvasElement, onBackend: (b: Backend)
   const forceWebGL = new URLSearchParams(location.search).has("webgl");
   const renderer = new THREE.WebGPURenderer({ canvas, antialias: true, forceWebGL, powerPreference: "high-performance" });
   await renderer.init();
+  renderer.shadowMap.enabled = true;
   renderer.toneMapping = THREE.AgXToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.outputColorSpace = THREE.SRGBColorSpace;

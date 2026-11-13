@@ -4,7 +4,7 @@
       "staticOverrides": {
         "byObject": {
           "Camera": {
-            "lookHeight": 80
+            "lookHeight": 86
           }
         }
       },
