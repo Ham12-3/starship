@@ -1,0 +1,221 @@
+{
+  "sheetsById": {
+    "Story": {
+      "staticOverrides": {
+        "byObject": {
+          "Camera": {
+            "lookHeight": 74
+          }
+        }
+      },
+      "sequence": {
+        "subUnitsPerUnit": 30,
+        "length": 16,
+        "type": "PositionalSequence",
+        "tracksByObject": {
+          "Camera": {
+            "trackData": {
+              "trkDistance": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"distance\"]",
+                "keyframes": [
+                  {
+                    "id": "kd0",
+                    "position": 0,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 4000
+                  },
+                  {
+                    "id": "kd1",
+                    "position": 15,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 4000
+                  }
+                ]
+              },
+              "trkHeight": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"height\"]",
+                "keyframes": [
+                  {
+                    "id": "kh0",
+                    "position": 0,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 3
+                  },
+                  {
+                    "id": "kh1",
+                    "position": 15,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 3
+                  }
+                ]
+              },
+              "trkBearing": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"bearing\"]",
+                "keyframes": [
+                  {
+                    "id": "kb0",
+                    "position": 0,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 32
+                  },
+                  {
+                    "id": "kb1",
+                    "position": 15,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 32
+                  }
+                ]
+              },
+              "trkFocal": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"focalLength\"]",
+                "keyframes": [
+                  {
+                    "id": "kf0",
+                    "position": 0,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 400
+                  },
+                  {
+                    "id": "kf1",
+                    "position": 1,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 455
+                  },
+                  {
+                    "id": "kf2",
+                    "position": 15,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": 455
+                  }
+                ]
+              },
+              "trkPan": {
+                "type": "BasicKeyframedTrack",
+                "__debugName": "Camera:[\"pan\"]",
+                "keyframes": [
+                  {
+                    "id": "kp0",
+                    "position": 0,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": -78
+                  },
+                  {
+                    "id": "kp1",
+                    "position": 1,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": -20
+                  },
+                  {
+                    "id": "kp2",
+                    "position": 15,
+                    "connectedRight": true,
+                    "handles": [
+                      0.5,
+                      1,
+                      0.5,
+                      0
+                    ],
+                    "type": "bezier",
+                    "value": -20
+                  }
+                ]
+              }
+            },
+            "trackIdByPropPath": {
+              "[\"distance\"]": "trkDistance",
+              "[\"height\"]": "trkHeight",
+              "[\"bearing\"]": "trkBearing",
+              "[\"focalLength\"]": "trkFocal",
+              "[\"pan\"]": "trkPan"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitionVersion": "0.4.0",
+  "revisionHistory": [
+    "phase1-golden-shot"
+  ]
+}
