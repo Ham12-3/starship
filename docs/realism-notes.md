@@ -72,3 +72,24 @@ Written observations only. No images were saved or copied.
 - Vapour around a loaded stack is heavy and billowing, lit hard by the floods. Ours is still thin.
 - Their own site uses a plain studio render of the stack on black for specs. Clean and readable: a good model for the
   comparison chapter.
+
+### Third pass (13 Nov 2026)
+
+- **Water.** A tidal lagoon between camera and pad with a true planar reflection (Ultra and High tiers; a glossy
+  plane on the others). It mirrors the sky, the shoreline, buildings and lamps, with slow ripples.
+- **Frost.** Each ring on the booster now ices differently, seams show through, and long runs break up the coat.
+- **People.** Twelve workers in hi-vis on the pad apron, three of them walking. About nine pixels tall at this
+  distance: enough to give the stack its size.
+- **Birds.** A line of pelicans crosses low over the water every minute and a half.
+- **Framing.** Aim lowered so the waterline is in shot, push-in softened (400 to 455 mm) so the tower top stays in
+  frame.
+
+Still giving it away:
+
+1. The reflection of the stack itself is mostly hidden behind the far shore. Worth testing a lower shoreline.
+2. Sky still has no cloud structure.
+3. Tower, mount and tank farm are still simple shapes up close; fine at this distance, not for any tighter shot.
+4. Vapour is still sprites.
+
+Measured in the dev pane (800 x 521) on the WebGL2 path with reflection on: about 16.6 ms a frame. Full-screen and
+phone are still unmeasured.

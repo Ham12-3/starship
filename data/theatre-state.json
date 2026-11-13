@@ -4,7 +4,7 @@
       "staticOverrides": {
         "byObject": {
           "Camera": {
-            "lookHeight": 86
+            "lookHeight": 74
           }
         }
       },
@@ -139,7 +139,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": 520
+                    "value": 455
                   },
                   {
                     "id": "kf2",
@@ -152,7 +152,7 @@
                       0
                     ],
                     "type": "bezier",
-                    "value": 520
+                    "value": 455
                   }
                 ]
               },

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three/webgpu";
 import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
+import { buildLagoon } from "./water";
 import {
   BOOSTER_H,
   MASTS,
@@ -154,6 +155,83 @@ function Lights() {
   return <primitive object={group} />;
 }
 
+/**
+ * People and birds. A worker is nine pixels tall at this distance, which is
+ * exactly enough to tell the eye how big everything else is.
+ */
+function Life() {
+  const { group, walkers, birds } = useMemo(() => {
+    const g = new THREE.Group();
+    const legs = new THREE.MeshStandardMaterial({ color: "#1d2230", roughness: 0.9 });
+    const skin = new THREE.MeshStandardMaterial({ color: "#c9c4bb", roughness: 0.6 });
+    const vests = ["#d8f02a", "#ff7a1a"].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.7, emissive: c, emissiveIntensity: 0.12 }));
+    const legGeo = new THREE.BoxGeometry(0.34, 0.86, 0.24);
+    const torsoGeo = new THREE.BoxGeometry(0.46, 0.64, 0.27);
+    const headGeo = new THREE.SphereGeometry(0.13, 8, 6);
+    const person = (x: number, z: number, i: number) => {
+      const p = new THREE.Group();
+      const a = new THREE.Mesh(legGeo, legs);
+      a.position.y = 0.43;
+      const t = new THREE.Mesh(torsoGeo, vests[i % 2]);
+      t.position.y = 1.18;
+      const h = new THREE.Mesh(headGeo, skin); // pale hard hat
+      h.position.y = 1.63;
+      p.add(a, t, h);
+      p.position.set(x, 1.2, z); // standing on the pad apron
+      g.add(p);
+      return p;
+    };
+    const spots: [number, number][] = [
+      [38, 27], [39.2, 27.6], [-22, 28], [61, 37], [63.5, 38.2], [-55, 43], [-12, 29],
+      [18, 28.5], [19.3, 28], [84, 30], [-33, 27.5], [5, 29],
+    ];
+    const people = spots.map(([x, z], i) => person(x, z, i));
+    const w = [people[2], people[9], people[11]];
+
+    // Brown pelicans, about 2 m across, in a loose line
+    const wing = new THREE.BufferGeometry();
+    wing.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, -0.22, 0, 0, 0.22, 1.05, 0, 0.05], 3));
+    wing.computeVertexNormals();
+    const dark = new THREE.MeshBasicMaterial({ color: "#14161a", side: THREE.DoubleSide });
+    const flock: { bird: THREE.Group; l: THREE.Mesh; r: THREE.Mesh; off: THREE.Vector3; phase: number }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const bird = new THREE.Group();
+      const l = new THREE.Mesh(wing, dark);
+      const r = new THREE.Mesh(wing, dark);
+      r.scale.x = -1;
+      bird.add(l, r);
+      g.add(bird);
+      flock.push({ bird, l, r, off: new THREE.Vector3(-i * 4.2, Math.sin(i * 1.7) * 1.3, i * 2.6 + Math.cos(i) * 1.5), phase: i * 0.9 });
+    }
+    return { group: g, walkers: w, birds: flock };
+  }, []);
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    walkers.forEach((p, i) => {
+      // An unhurried walk, about 1.2 m/s, back and forth along the apron
+      const span = 30 + i * 9;
+      const u = (t * 1.2 + i * 17) % (span * 2);
+      p.position.x = (i % 2 ? 20 : -40) + (u < span ? u : span * 2 - u);
+      p.position.y = 1.2 + Math.abs(Math.sin(t * 5.5 + i)) * 0.04;
+    });
+    // The flock crosses the frame low over the water every minute and a half
+    const cycle = 90;
+    const u = (t % cycle) / cycle;
+    const x = -520 + u * 1040;
+    for (const b of birds) {
+      b.bird.position.set(x + b.off.x, 34 + Math.sin(u * Math.PI) * 9 + b.off.y, 420 + b.off.z);
+      // Pelicans flap a few beats, then glide
+      const beat = Math.sin(t * 5.2 + b.phase);
+      const glide = Math.sin(t * 0.35 + b.phase) > 0.2 ? 0.25 : 1;
+      b.l.rotation.z = beat * 0.55 * glide + 0.08;
+      b.r.rotation.z = -(beat * 0.55 * glide + 0.08);
+    }
+  });
+
+  return <primitive object={group} />;
+}
+
 function Flood({ from, to, shadow }: { from: [number, number, number]; to: [number, number, number]; shadow: boolean }) {
   const light = useMemo(() => {
     const l = new THREE.SpotLight(LOOK.floodlight, LOOK.floodIntensity, 0, 0.5, 0.7, 2);
@@ -184,7 +262,7 @@ export default function GoldenShot({ onReady, shadows }: { onReady: () => void; 
   const parts = useMemo(() => {
     const b = (LOOK.cameraBearingDeg * Math.PI) / 180;
     const cam = new THREE.Vector3(Math.sin(b) * LOOK.cameraDistance, 0, Math.cos(b) * LOOK.cameraDistance);
-    const p = { stack: buildStack(), tower: buildTower(), site: buildSite(), ground: buildGround(), foreground: buildForeground(cam), afterglow: buildAfterglow(cam) };
+    const p = { stack: buildStack(), tower: buildTower(), site: buildSite(), ground: buildGround(), foreground: buildForeground(cam), afterglow: buildAfterglow(cam), lagoon: buildLagoon(cam, shadows) };
     for (const o of [p.stack, p.tower, p.site])
       o.traverse((m) => {
         m.castShadow = true;
@@ -192,7 +270,7 @@ export default function GoldenShot({ onReady, shadows }: { onReady: () => void; 
       });
     p.ground.traverse((m) => void (m.receiveShadow = true));
     return p;
-  }, []);
+  }, [shadows]);
 
   useEffect(() => {
     let cancelled = false;
@@ -220,7 +298,9 @@ export default function GoldenShot({ onReady, shadows }: { onReady: () => void; 
     <>
       <primitive object={parts.ground} />
       <primitive object={parts.afterglow} />
+      <primitive object={parts.lagoon} />
       <primitive object={parts.foreground} />
+      <Life />
       <primitive object={parts.site} />
       <primitive object={parts.tower} />
       <primitive object={parts.stack} position={[0, PAD_H, 0]} />

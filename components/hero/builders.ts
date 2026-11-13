@@ -117,6 +117,19 @@ function steelMaps(o: SteelOpts) {
       c.fillStyle = rand() > 0.5 ? `rgba(255,255,255,${rand() * 0.2})` : `rgba(150,158,168,${rand() * 0.22})`;
       c.fillRect(x, yy, s * 2.2, s * 0.6);
     }
+    for (let h0 = Math.ceil(f0 / ring) * ring; h0 < f1; h0 += ring) {
+      const rt = y(Math.min(h0 + ring, f1));
+      const rb = y(h0);
+      c.fillStyle = rand() > 0.5 ? `rgba(150,157,166,${0.08 + rand() * 0.2})` : `rgba(240,244,248,${0.05 + rand() * 0.14})`;
+      c.fillRect(0, rt, W, rb - rt);
+      c.fillStyle = "rgba(118,124,133,0.42)";
+      c.fillRect(0, rb - 2, W, 2);
+    }
+    // Long vertical runs where ice has slid or melted
+    for (let i = 0; i < 160; i++) {
+      c.fillStyle = `rgba(135,142,152,${0.08 + rand() * 0.16})`;
+      c.fillRect(rand() * W, top + rand() * (bot - top) * 0.8, 2 + rand() * 7, 40 + rand() * 260);
+    }
     // Ragged lower edge where frost thins toward the tank dome
     for (let x = 0; x < W; x += 3) {
       const d = rand() * 26;
@@ -554,7 +567,7 @@ export function buildForeground(toward: THREE.Vector3) {
   const q = new THREE.Quaternion();
   const up = new THREE.Vector3(0, 1, 0);
   for (let i = 0; i < 70; i++) {
-    const d = 380 + Math.pow(rand(), 1.4) * (dist - 900);
+    const d = 380 + Math.pow(rand(), 1.4) * 760;
     const lateral = (rand() - 0.5) * (220 + d * 0.16);
     const p = dir.clone().multiplyScalar(d).addScaledVector(side, lateral);
     const w = 30 + rand() * 110;
@@ -575,31 +588,19 @@ export function buildForeground(toward: THREE.Vector3) {
       bushes.push(m.clone());
     }
   }
+  for (let i = 0; i < 260; i++) {
+    const lateral = (rand() - 0.5) * 1500;
+    const p = dir.clone().multiplyScalar(150 + rand() * 26).addScaledVector(side, lateral);
+    const sz = 0.5 + rand() * 1.6;
+    q.setFromAxisAngle(up, rand() * Math.PI);
+    m.compose(new THREE.Vector3(p.x, sz * 0.3, p.z), q, new THREE.Vector3(sz * (1.5 + rand() * 2), sz * 0.6, sz));
+    bushes.push(m.clone());
+  }
   const duneMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), sand, dunes.length);
   dunes.forEach((d, i) => duneMesh.setMatrixAt(i, d));
   const bushMesh = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), scrub, bushes.length);
   bushes.forEach((d, i) => bushMesh.setMatrixAt(i, d));
   g.add(duneMesh, bushMesh);
-
-  // Tidal lagoons: long sheets of still water lying across the view. At this
-  // grazing angle they mirror the sky just above the horizon.
-  const water = new THREE.MeshStandardMaterial({ color: "#0d1116", roughness: 0.06, metalness: 0 });
-  const disc = new THREE.CircleGeometry(1, 48);
-  for (const [d, lateral, len, wid] of [
-    [520, -40, 520, 46],
-    [900, 120, 700, 70],
-    [1500, -160, 900, 110],
-    [2300, 60, 1300, 150],
-    [3100, -220, 900, 90],
-  ]) {
-    const p = dir.clone().multiplyScalar(d).addScaledVector(side, lateral);
-    const pool = new THREE.Mesh(disc, water);
-    pool.rotation.set(-Math.PI / 2, 0, Math.atan2(side.x, side.z) - Math.PI / 2);
-    pool.scale.set(len, wid, 1);
-    pool.position.set(p.x, 0.06, p.z);
-    pool.receiveShadow = true;
-    g.add(pool);
-  }
 
   const pole = new THREE.MeshStandardMaterial({ color: "#1c1a17", roughness: 0.9 });
   for (let i = 0; i < 14; i++) {
