@@ -44,7 +44,7 @@ unverified facts, and runs before every build.
 | Item | Brief | Now | Status |
 |---|---|---|---|
 | Flight 15 outcome | Unknown | Not launched yet at time of check (NET 22:45 UTC, 13 Nov) | Re-check after 14 Nov |
-| Booster liftoff thrust | ~80.8 MN | ~90.6 MN stored, range 80.8 to 90.6 | Unresolved. 33 x 280 tf = 9,240 tf = 90.6 MN, so the brief's two numbers disagree with each other. Owner to decide |
+| Booster liftoff thrust | ~80.8 MN | ~90.6 MN, shown as "about 90 MN" | Decided by owner, 13 Nov 2026. 33 x 280 tf = 9,240 tf = 90.6 MN |
 | Ship height | ~52 m | ~52.1 m (derived) | No official V3 figure found |
 | V3 tile count | Unknown | Unknown, stored as null | Do not show a number |
 | Starbase buildings | To verify | Starfactory, Mega Bay 1 and 2, Gigabay (under construction, target end 2026) | Confirmed |

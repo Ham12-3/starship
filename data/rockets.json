@@ -47,8 +47,8 @@
       "value": 90.6,
       "unit": "MN",
       "approx": true,
-      "note": "UNRESOLVED. The brief said ~80.8 MN (= 33 x 250 tf). Most 2026 sources say ~9,200 to 9,240 tf (= 33 x 280 tf, ~90.6 MN), which matches the 280 tf per-engine figure. Range 80.8 to 90.6. Needs owner sign-off before it goes on screen.",
-      "verified": false,
+      "note": "Owner decision 13 Nov 2026: show \"about 90 MN\". 33 x 280 tf = 9,240 tf = 90.6 MN. Some sources still quote ~80.8 MN (33 x 250 tf).",
+      "verified": true,
       "source": "https://payloadspace.com/what-to-expect-from-starship-v3/",
       "asOf": "2026-11-13"
     },
@@ -329,8 +329,8 @@
         "value": 90.6,
         "unit": "MN",
         "approx": true,
-        "note": "See hero.boosterLiftoffThrust: unresolved, 80.8 to 90.6.",
-        "verified": false,
+        "note": "Owner decision 13 Nov 2026: show \"about 90 MN\". 33 x 280 tf = 9,240 tf = 90.6 MN. Some sources still quote ~80.8 MN (33 x 250 tf).",
+        "verified": true,
         "source": "https://en.wikipedia.org/wiki/SpaceX_Starship",
         "asOf": "2026-11-13"
       },
